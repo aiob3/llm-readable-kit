@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cross-CLI Bridge"
+  short_description: "Codex + Claude Code capability routing"
+  default_prompt: "What tools are available for this task?"

@@ -11,3 +11,8 @@ desktop.ini
 *.swp
 *.swo
 *~
+
+# OpenCode & MCP
+.opencode/.env
+.opencode/mcp.json
+.opencode/memory/

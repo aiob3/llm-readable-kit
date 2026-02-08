@@ -1,0 +1,4 @@
+interface:
+  display_name: "OpenCode Bridge"
+  short_description: "OpenCode CLI integration and tool routing"
+  default_prompt: "O que o OpenCode pode fazer por mim?"

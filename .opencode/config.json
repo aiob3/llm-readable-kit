@@ -1,0 +1,30 @@
+{
+  "version": "1.0",
+  "language": "pt-BR",
+  "triCli": {
+    "enabled": true,
+    "codex": {
+      "enabled": true,
+      "skillsPath": "C:\\Users\\papa\\.codex\\skills"
+    },
+    "claude": {
+      "enabled": true,
+      "configPath": "C:\\Users\\papa\\.claude"
+    }
+  },
+  "features": {
+    "autoTranslate": true,
+    "smartCompletion": true,
+    "taskTracking": true
+  },
+  "skills": {
+    "crossCliBridge": {
+      "path": "C:\\Users\\papa\\.codex\\skills\\cross-cli-bridge",
+      "enabled": true
+    },
+    "opencodeBridge": {
+      "path": "C:\\Users\\papa\\.codex\\skills\\opencode-bridge",
+      "enabled": true
+    }
+  }
+}
