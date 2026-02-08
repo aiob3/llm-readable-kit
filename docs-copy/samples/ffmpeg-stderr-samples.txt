@@ -1,0 +1,8 @@
+# Exemplos de linhas de stderr do FFmpeg — utilizado como fixtures para testes
+
+frame=  304 fps=0.0 q=-1.0 size=    3584kB time=00:00:12.17 bitrate=2408.9kbits/s speed=24.3x
+frame=  305 fps=25.0 q=23.0 size=    3624kB time=00:00:13.68 bitrate=2408.9kbits/s speed=24.3x
+size=    4096kB time=00:01:23.456 bitrate=2408.9kbits/s speed=1.23x
+time=00:00:00.683
+frame=50 time=00:45:01.123 bitrate=1024.1kbits/s
+progress=end

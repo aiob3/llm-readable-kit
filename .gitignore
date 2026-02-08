@@ -1,0 +1,13 @@
+# Pastas auxiliares de trabalho local
+master/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editores
+.vscode/settings.json
+*.swp
+*.swo
+*~
