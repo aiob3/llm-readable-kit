@@ -59,6 +59,10 @@ docs-copy/                         ← ESTA PASTA é copiada para projetos-alvo
 
 Ler `.github/copilot-instructions.md` para convenções do projeto, ou ir direto para `docs-copy/CODEX_TASK.md` como entry point de execução.
 
+## Autor
+
+brito@vcia.com.br   |   linkedin.com/in/brito1   |    indygolab.com
+
 ## Licença
 
 [MIT](LICENSE)
