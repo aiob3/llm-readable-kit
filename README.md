@@ -50,10 +50,10 @@ docs-copy/                         ← ESTA PASTA é copiada para projetos-alvo
 
 ## Entregáveis Produzidos
 
-| Feature | Arquivo | Status |
-|---------|---------|--------|
-| Semantic Export (Visual→LLM Bridge) | `components/llm-readable.semantic-export.skill.md` | Aprovado |
-| Progress Bar 1-a-1 (FFmpeg) | `components/llm-readable.progress-bar-1-a-1.skill.md` | Aprovado |
+| Feature                             | Arquivo                                               | Status   |
+| ----------------------------------- | ----------------------------------------------------- | -------- |
+| Semantic Export (Visual→LLM Bridge) | `components/llm-readable.semantic-export.skill.md`    | Aprovado |
+| Progress Bar 1-a-1 (FFmpeg)         | `components/llm-readable.progress-bar-1-a-1.skill.md` | Aprovado |
 
 ## Para Agentes AI
 
