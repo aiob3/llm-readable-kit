@@ -1,0 +1,117 @@
+:root {
+  --bg-0: #f6f7f1;
+  --bg-1: #dce9d5;
+  --ink: #1f2a20;
+  --ink-soft: #36513d;
+  --accent: #0f7f52;
+  --accent-2: #c95d17;
+  --card: #ffffffd9;
+  --line: #b8d1bd;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--ink);
+  font-family: var(--font-heading), "Segoe UI", sans-serif;
+  background:
+    radial-gradient(1200px 600px at -10% -10%, #fff8dd 0%, transparent 70%),
+    radial-gradient(900px 400px at 110% 10%, #cde4d0 0%, transparent 65%),
+    linear-gradient(145deg, var(--bg-0), var(--bg-1));
+}
+
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+}
+
+.panel {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: 0 10px 30px rgba(31, 42, 32, 0.08);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 980px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.code {
+  font-family: var(--font-mono), ui-monospace, monospace;
+}
+
+.textarea {
+  width: 100%;
+  min-height: 280px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  padding: 0.9rem;
+  background: #ffffff;
+  font-family: var(--font-mono), ui-monospace, monospace;
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+button {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.6rem 0.9rem;
+  color: white;
+  background: linear-gradient(90deg, var(--accent), #26a96e);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+button.secondary {
+  background: linear-gradient(90deg, var(--accent-2), #dc7f2b);
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.error {
+  border-left: 4px solid #b01717;
+  background: #fff1f1;
+  color: #7b1212;
+  border-radius: 8px;
+  padding: 0.7rem;
+}
+
+.kv {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.timeline-item {
+  border-top: 1px dashed var(--line);
+  padding-top: 0.5rem;
+  margin-top: 0.5rem;
+}

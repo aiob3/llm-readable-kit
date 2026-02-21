@@ -1,0 +1,4 @@
+interface:
+  display_name: "Canonical Parser DB"
+  short_description: "DSL parser, schema and Postgres model for Canonical SSOT"
+  default_prompt: "Atualize parser/schema/migração do framework canônico com idempotência e testes."

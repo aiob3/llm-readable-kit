@@ -1,0 +1,75 @@
+version: 1
+workspace: docs-copy
+mission: Consolidar operacao multiagente para Copilot, Codex, Claude e OpenCode com governanca unica de skills, MCPs e features.
+
+ssot:
+  agent_rules: AGENTS.md
+  copilot_instructions: .github/copilot-instructions.md
+  claude_instructions: .claude/CLAUDE.md
+  claude_plugins: .claude/settings.json
+  opencode_features: .opencode/config.json
+  mcp_topology: opencode.json
+  security_bootstrap: .opencode/setup-env.sh
+  memora_protocol: .agentic/MEMORA-PERSISTENT-PROTOCOL.md
+  memora_logger: .agentic/scripts/memora_ops.py
+
+interfaces:
+  copilot:
+    role: Extração e documentação via Fundation Agent
+    entrypoints:
+      - docs-copy/CODEX_TASK.md
+      - docs-copy/fundation-agent.prompt.md
+  codex:
+    role: Execução técnica, automação, merge e hardening
+    skill_source: AGENTS.md (sessão atual)
+  claude:
+    role: Fluxos longos (feature-dev), revisão paralela e commit assistido
+    plugins_enabled:
+      - code-review@claude-plugins-official
+      - commit-commands@claude-plugins-official
+      - feature-dev@claude-plugins-official
+      - security-guidance@claude-plugins-official
+  opencode:
+    role: Exploração rápida, automação shell e orquestração local
+    features_enabled:
+      - autoTranslate
+      - smartCompletion
+      - taskTracking
+    bridge_skills:
+      - .opencode/skills/cross-cli-bridge/SKILL.md
+      - .opencode/skills/opencode-bridge/SKILL.md
+
+mcps:
+  core_enabled:
+    - sequential-thinking
+    - chrome-devtools
+    - memora
+  deprecated:
+    - memory-keeper
+  rollback_only:
+    - memory
+  optional_disabled_by_default:
+    - github
+    - postgres
+    - firecrawl
+    - exa
+    - browserbase
+  env_required:
+    - GITHUB_PERSONAL_ACCESS_TOKEN
+    - POSTGRES_MCP_URI
+    - FIRECRAWL_API_KEY
+    - EXA_API_KEY
+    - BROWSERBASE_API_KEY
+    - OPENAI_API_KEY
+
+governance:
+  line_endings: .gitattributes
+  secret_policy: Nunca versionar tokens/chaves; usar .env na raiz (fallback .opencode/.env)
+  sync_policy: Toda mudanca de skill/mcp deve atualizar .agentic/registry.yaml
+  memora_policy:
+    persistent_logging_required: true
+    start_on_first_prompt: true
+    atomic_idempotent_logging: true
+  hitl_policy:
+    operator_authority: O Operador decide em caso de duvida e aprovacoes relevantes.
+    assistant_duty: Propor alternativas com esforco, impacto e pareto, e consultar antes de decisao incerta.

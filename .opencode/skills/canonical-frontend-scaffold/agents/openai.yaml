@@ -1,0 +1,4 @@
+interface:
+  display_name: "Canonical Frontend"
+  short_description: "Next.js scaffold for Canonical SSOT web interfaces"
+  default_prompt: "Crie ou evolua a interface canonical (input/review/iam/timeline) preservando o contrato do schema."

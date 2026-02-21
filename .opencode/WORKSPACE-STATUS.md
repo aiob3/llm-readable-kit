@@ -222,7 +222,10 @@ O Knowledge Graph está vazio porque as memórias são criadas **durante as sess
 - Comandos úteis descobertos
 
 ### Para o operador usar o Graph:
-1. Iniciar o servidor: `python -m memora --graph-port 8765`
+1. Iniciar o servidor via script do workspace:
+   - Linux/WSL: `bash .opencode/start-memora-graph.sh`
+   - PowerShell: `powershell -ExecutionPolicy Bypass -File .opencode\start-memora-graph.ps1`
+   - CMD: `.opencode\start-memora-graph.bat`
 2. Acessar: `http://localhost:8765/graph`
 3. As memórias aparecerão automaticamente conforme eu (IA) criar durante as sessões
 
@@ -285,10 +288,10 @@ O servidor MCP Memora está ativo, mas o Graph UI precisa ser iniciado manualmen
 powershell -ExecutionPolicy Bypass -File .opencode\start-memora-graph.ps1
 
 # Opção 2: CMD
-.start-memora-graph.bat
+.opencode\start-memora-graph.bat
 
 # Opção 3: Direto
-python -m memora --graph-port 8765
+.opencode/.venv-memora/bin/memora-server --transport sse --host 127.0.0.1 --port 8000
 ```
 
 **Acessar**: `http://localhost:8765/graph`

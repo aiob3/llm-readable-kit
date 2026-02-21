@@ -13,6 +13,11 @@ desktop.ini
 *~
 
 # OpenCode & MCP
+.env
+.env.local
 .opencode/.env
+.opencode/.env.local
 .opencode/mcp.json
 .opencode/memory/
+opencode.local.json
+.agentic/active-session.json

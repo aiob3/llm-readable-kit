@@ -59,6 +59,28 @@ docs-copy/                         ← ESTA PASTA é copiada para projetos-alvo
 
 Ler `.github/copilot-instructions.md` para convenções do projeto, ou ir direto para `docs-copy/CODEX_TASK.md` como entry point de execução.
 
+## Operação Multiagente Centralizada
+
+Para operação unificada entre Copilot, Codex, Claude e OpenCode:
+
+- Inventário oficial: `.agentic/registry.yaml`
+- Modelo operacional: `.agentic/centralized-operating-model.md`
+- Protocolo de memória persistente: `.agentic/MEMORA-PERSISTENT-PROTOCOL.md`
+- Logger atômico/idempotente: `.agentic/scripts/memora_ops.py`
+- Topologia MCP segura: `opencode.json` + `.opencode/.env.example`
+
+## Piloto Canonical SSOT v1 (Web + DB)
+
+Implementação de referência do framework canônico (DSL + JSON Schema + parser TS + Postgres + Next.js + CI):
+
+- Projeto piloto: `pilot/canonical-ssot-v1`
+- Especificação DSL: `pilot/canonical-ssot-v1/docs/canonical-dsl.v1.md`
+- Schema: `pilot/canonical-ssot-v1/schema/canonical-normalized.v1.schema.json`
+- Workflow de gate: `.github/workflows/canonical-validate.yml`
+- Skills dedicadas:
+  - `.opencode/skills/canonical-parser-db/SKILL.md`
+  - `.opencode/skills/canonical-frontend-scaffold/SKILL.md`
+
 ## Autor
 
 brito@vcia.com.br   |   linkedin.com/in/brito1   |    indygolab.com

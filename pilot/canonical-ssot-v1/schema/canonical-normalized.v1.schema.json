@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ssot.example/canonical-normalized.v1.schema.json",
+  "title": "CanonicalNormalizedV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "event_layer",
+    "iam_layer",
+    "catalog_resolution",
+    "metadata"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "canonical-normalized.v1"
+    },
+    "event_layer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "o_opp",
+        "v_vdd",
+        "i_idl",
+        "q_qbr",
+        "l_led",
+        "k_kbi",
+        "a_acc",
+        "s_src",
+        "e_e2e",
+        "b_b2b",
+        "n_n2c",
+        "h_hor",
+        "t_tzo",
+        "d_dat"
+      ],
+      "properties": {
+        "o_opp": { "type": "string", "minLength": 3 },
+        "v_vdd": { "type": "string", "minLength": 3 },
+        "i_idl": { "const": "i_q-l-k-a-s-e-b-n-h-t-d" },
+        "q_qbr": { "type": "string", "pattern": "^q_q\\d+-\\d{2}-\\d+$" },
+        "l_led": { "type": "string", "minLength": 3 },
+        "k_kbi": { "type": "string", "pattern": "^k_\\d{8}-\\d{6}$" },
+        "a_acc": { "type": "string", "pattern": "^a_\\d+-[^\\s].*$" },
+        "s_src": { "type": "string", "minLength": 3 },
+        "e_e2e": { "type": "string", "minLength": 3 },
+        "b_b2b": { "type": "string", "minLength": 3 },
+        "n_n2c": { "type": "string", "minLength": 3 },
+        "h_hor": { "type": "string", "pattern": "^h_\\d{2}-\\d{2}-\\d{2}$" },
+        "t_tzo": { "type": "string", "pattern": "^t_\\d+-[A-Za-z_]+/[A-Za-z_]+$" },
+        "d_dat": { "type": "string", "pattern": "^d_\\d{2}-\\d{2}-\\d{2}$" }
+      }
+    },
+    "iam_layer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["u_usr", "w_www", "m_mob", "c_con", "x_pwd", "f_hom", "z_zon"],
+      "properties": {
+        "u_usr": { "type": "string", "pattern": "^u_\\d+-\\$\\{a_\\*-\\}-[a-zA-Z0-9_-]+$" },
+        "w_www": { "type": "string", "pattern": "^w_[a-z0-9-]+$" },
+        "m_mob": { "type": "string", "pattern": "^m_\\d{8,16}$" },
+        "c_con": { "type": "string", "pattern": "^c_\\d+-[A-Za-z0-9_-]+$" },
+        "x_pwd": { "type": "string", "pattern": "^x_\\d+-.+$" },
+        "f_hom": { "type": "string", "pattern": "^f_home-\\$\\{u_\\d+\\}$" },
+        "z_zon": { "type": "string", "pattern": "^z_\\d+-c_\\d+-u_\\d+$" }
+      }
+    },
+    "catalog_resolution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role_code", "role_label", "zone_level", "zone_label"],
+      "properties": {
+        "role_code": { "type": "integer" },
+        "role_label": { "type": "string" },
+        "zone_level": { "type": "integer" },
+        "zone_label": { "type": "string" }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["payload_hash", "idempotency_key", "normalized_at_utc"],
+      "properties": {
+        "payload_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "idempotency_key": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "normalized_at_utc": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}

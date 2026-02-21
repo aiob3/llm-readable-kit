@@ -1,23 +1,42 @@
-#!/bin/bash
-# ==============================================================================
-# Script de Inicialização de Ambiente Tri-CLI Seguro
-# Carrega as variáveis de ambiente necessárias para os MCPs do Copilot
-# (Firecrawl, Exa, Browserbase, Memory-Keeper) sem expô-las no código.
-# ==============================================================================
+#!/usr/bin/env bash
+# Carrega variáveis de ambiente locais para MCPs sem versionar segredos.
 
-# Diretório base
-BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &> /dev/null && pwd)"
-ENV_FILE="$BASE_DIR/.env"
+set -euo pipefail
 
-if [ -f "$ENV_FILE" ]; then
-    echo "🔑 Carregando segredos e configurações do arquivo .env..."
-    # Carrega as variáveis de ambiente ignorando linhas em branco ou comentários
-    export $(grep -v '^#' "$ENV_FILE" | xargs)
-    echo "✅ Variáveis de ambiente configuradas com sucesso."
+BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null 2>&1 && pwd)"
+ROOT_DIR="$(cd "${BASE_DIR}/.." >/dev/null 2>&1 && pwd)"
+ROOT_ENV_FILE="${ROOT_DIR}/.env"
+LOCAL_ENV_FILE="${BASE_DIR}/.env"
+ENV_EXAMPLE_FILE="${BASE_DIR}/.env.example"
+
+load_env_file() {
+    local file="$1"
+    while IFS= read -r line || [ -n "$line" ]; do
+        # Ignora linhas vazias e comentários
+        [[ -z "${line// }" || "${line#\#}" != "$line" ]] && continue
+
+        # Exporta apenas linhas no formato KEY=VALUE
+        if [[ "$line" == *=* ]]; then
+            local key="${line%%=*}"
+            local value="${line#*=}"
+            export "$key=$value"
+        fi
+    done < "$file"
+}
+
+if [ -f "$ROOT_ENV_FILE" ]; then
+    echo "Carregando variaveis de ambiente de ${ROOT_ENV_FILE}"
+    load_env_file "$ROOT_ENV_FILE"
+    echo "Variaveis carregadas com sucesso."
+elif [ -f "$LOCAL_ENV_FILE" ]; then
+    echo "Carregando variaveis de ambiente de ${LOCAL_ENV_FILE}"
+    load_env_file "$LOCAL_ENV_FILE"
+    echo "Variaveis carregadas com sucesso."
 else
-    echo "⚠️  Aviso: Arquivo .env não encontrado em $ENV_FILE"
-    echo "    Certifique-se de configurar as API Keys para Firecrawl, Exa e Browserbase."
+    echo "Arquivo .env nao encontrado na raiz (${ROOT_ENV_FILE}) nem em .opencode (${LOCAL_ENV_FILE})."
+    if [ -f "$ENV_EXAMPLE_FILE" ]; then
+        echo "Use ${ENV_EXAMPLE_FILE} como base para criar o .env."
+    fi
 fi
 
-echo "🚀 O ambiente Tri-CLI está pronto para uso!"
-echo "    Você pode executar comandos 'claude' ou 'codex' com suporte total aos MCPs."
+echo "Ambiente Tri-CLI preparado."

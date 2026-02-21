@@ -1,0 +1,61 @@
+name: canonical-validate
+
+on:
+  pull_request:
+    paths:
+      - "pilot/canonical-ssot-v1/**"
+      - ".github/workflows/canonical-validate.yml"
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - "pilot/canonical-ssot-v1/**"
+      - ".github/workflows/canonical-validate.yml"
+
+jobs:
+  canonical-validate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: pilot/canonical-ssot-v1
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+          cache-dependency-path: pilot/canonical-ssot-v1/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate schema types
+        run: npm run build:types
+
+      - name: Parse sample DSL
+        run: npm run parse:sample
+
+      - name: Validate normalized JSON
+        run: npm run validate:sample
+
+      - name: Emit SQL snapshot
+        run: ./canonical emit-sql --in artifacts/sample.json --out artifacts/0001_snapshot.sql
+
+      - name: Validate SQL migration
+        run: npm run validate:sql
+
+      - name: Run tests
+        run: npm test
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: canonical-validate-artifacts
+          path: |
+            pilot/canonical-ssot-v1/artifacts/sample.json
+            pilot/canonical-ssot-v1/artifacts/0001_snapshot.sql

@@ -10,22 +10,22 @@
       "type": "local",
       "command": ["npx", "-y", "@modelcontextprotocol/server-memory"],
       "environment": {
-        "MEMORY_FILE_PATH": "G:/projetos/docs-copy/.opencode/memory/cursor-memory.json"
+        "MEMORY_FILE_PATH": ".opencode/memory/cursor-memory.json"
       },
-      "enabled": true
+      "enabled": false
     },
     "github": {
       "type": "local",
       "command": ["npx", "-y", "@modelcontextprotocol/server-github"],
       "environment": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "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"
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_PERSONAL_ACCESS_TOKEN}"
       },
-      "enabled": true
+      "enabled": false
     },
     "postgres": {
       "type": "local",
-      "command": ["npx", "-y", "@modelcontextprotocol/server-postgres", "postgresql://mcp_agent:Velha%4044ch51a164@pg_ssot.vcia.com.br:5432/ssot_mcp"],
-      "enabled": true
+      "command": ["npx", "-y", "@modelcontextprotocol/server-postgres", "${POSTGRES_MCP_URI}"],
+      "enabled": false
     },
     "chrome-devtools": {
       "type": "local",
@@ -36,28 +36,28 @@
       "type": "local",
       "command": ["npx", "-y", "firecrawl-mcp"],
       "environment": {
-        "FIRECRAWL_API_KEY": "fc-95833a474856499f96fafa8bb5ced76c"
+        "FIRECRAWL_API_KEY": "${FIRECRAWL_API_KEY}"
       },
-      "enabled": true
+      "enabled": false
     },
     "exa": {
       "type": "remote",
-      "url": "https://mcp.exa.ai/mcp?exaApiKey=024c5c7e-29ed-4415-b0f6-cbf0d922fee9",
-      "enabled": true
+      "url": "https://mcp.exa.ai/mcp?exaApiKey=${EXA_API_KEY}",
+      "enabled": false
     },
     "browserbase": {
       "type": "local",
       "command": ["npx", "-y", "@browserbasehq/mcp-server-browserbase"],
       "environment": {
-        "BROWSERBASE_API_KEY": "bb_live_yQgSWr8QhzdE4ZRtDWUAeocvIKU"
+        "BROWSERBASE_API_KEY": "${BROWSERBASE_API_KEY}"
       },
-      "enabled": true
+      "enabled": false
     },
     "memora": {
       "type": "local",
-      "command": ["C:/Users/papa/AppData/Local/Programs/Python/Python313/python.exe", "-m", "memora"],
+      "command": [".opencode/.venv-memora/bin/memora-server", "--transport", "stdio"],
       "environment": {
-        "MEMORA_DB_PATH": "G:/projetos/docs-copy/.opencode/memory/memoria.db",
+        "MEMORA_DB_PATH": ".opencode/memory/memoria.db",
         "MEMORA_ALLOW_ANY_TAG": "1",
         "MEMORA_GRAPH_PORT": "8765"
       },

@@ -41,6 +41,19 @@ Não carregar todos os chunks sempre. Usar o mapa em `docs-copy/CODEX_TASK.md` s
 5. **Gate HITL**: agente PARA e aguarda aprovação do Operador — nunca auto-aprovar
 6. Scoring L0-L5 ≥ 80/100 obrigatório antes de depositar
 
+## Protocolo Memora Persistente (Obrigatório)
+
+Para este workspace, qualquer interação que promova mudança técnica deve registrar trilha no Memora desde o primeiro prompt da conversa.
+
+- Protocolo: `.agentic/MEMORA-PERSISTENT-PROTOCOL.md`
+- CLI de registro: `python3 .agentic/scripts/memora_ops.py`
+
+Sequência mandatória:
+1. `start` no início da conversa
+2. `checkpoint`/`change` durante a execução
+3. `inference`/`decision` para dúvidas e trade-offs (com esforço, impacto e pareto)
+4. `delivery`/`end` no fechamento
+
 ## Convenções Críticas
 
 ### Nomenclatura de arquivos

@@ -1,30 +1,51 @@
 @echo off
-REM ============================================
-REM Memora Graph Server Starter
-REM Inicia o servidor de visualização do Graph
-REM em background e mantém rodando
-REM ============================================
+setlocal enabledelayedexpansion
+REM Memora Graph Server Starter (modo persistente)
 
+set ROOT_DIR=%~dp0..
 set GRAPH_PORT=8765
-set MEMORA_DB_PATH=G:\projetos\docs-copy\.opencode\memory\memoria.db
+set MCP_PORT=8000
+set MEMORA_DB_PATH=%ROOT_DIR%\.opencode\memory\memoria.db
 set MEMORA_ALLOW_ANY_TAG=1
+set MEMORA_GRAPH_PORT=%GRAPH_PORT%
+set PID_FILE=%ROOT_DIR%\.opencode\memora-graph.pid
+set LOG_FILE=%ROOT_DIR%\.opencode\memora-graph.log
 
-echo Starting Memora Graph Server on port %GRAPH_PORT%...
-echo Graph UI: http://localhost:%GRAPH_PORT%/graph
-echo.
-
-start /b cmd /c "C:\Users\papa\AppData\Local\Programs\Python\Python313\python.exe -m memora --graph-port %GRAPH_PORT%"
-
-timeout /t 3 /nobreak >nul
-
-curl -s -o nul -w "%%{http_code}" http://localhost:%GRAPH_PORT%/graph 2>nul
-if %errorlevel%==200 (
-    echo Graph server started successfully!
-    echo Access: http://localhost:%GRAPH_PORT%/graph
-) else (
-    echo Warning: Could not verify graph server startup
+set MEMORA_CMD=%ROOT_DIR%\.opencode\.venv-memora\Scripts\memora-server.exe
+if not exist "%MEMORA_CMD%" (
+    where memora-server >nul 2>nul
+    if errorlevel 1 (
+        echo Memora runtime nao encontrado.
+        echo Instale o runtime e tente novamente.
+        exit /b 1
+    ) else (
+        set MEMORA_CMD=memora-server
+    )
 )
 
+echo Starting Memora Graph Server...
+echo Graph UI: http://127.0.0.1:%GRAPH_PORT%/graph
+echo MCP SSE: http://127.0.0.1:%MCP_PORT%/sse
 echo.
-echo Press any key to close this window (server will continue running)...
-pause >nul
+
+start "" /b cmd /c ""%MEMORA_CMD%" --transport sse --host 127.0.0.1 --port %MCP_PORT% 1>>"%LOG_FILE%" 2>&1"
+
+set READY=0
+for /l %%i in (1,1,10) do (
+    timeout /t 2 /nobreak >nul
+    curl -fsS --max-time 5 http://127.0.0.1:%GRAPH_PORT%/graph >nul 2>nul
+    if not errorlevel 1 (
+        set READY=1
+        goto :ready
+    )
+)
+
+:ready
+if "%READY%"=="1" (
+    echo Graph server started successfully!
+    echo Access: http://127.0.0.1:%GRAPH_PORT%/graph
+) else (
+    echo Falha ao validar Graph UI. Verifique o log em:
+    echo %LOG_FILE%
+    exit /b 1
+)

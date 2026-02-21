@@ -21,6 +21,8 @@ description: Coordinates Codex CLI, Claude Code CLI, and OpenCode CLI capabiliti
 | `skill-creator` | creating new Codex skills |
 | `skill-installer` | installing skills from GitHub |
 | `opencode-bridge` | OpenCode integration tasks |
+| `canonical-parser-db` | canonical DSL/parser/schema/DB/event-log work |
+| `canonical-frontend-scaffold` | canonical Next.js UI scaffold and flows |
 
 ### Claude Code CLI (`claude`)
 **Plugins installed** (use as `/command` inside `claude`):
@@ -63,6 +65,8 @@ description: Coordinates Codex CLI, Claude Code CLI, and OpenCode CLI capabiliti
 | Create git commit + PR | Either (both have this capability) |
 | Frontend UI work | Either (both have design guidance) |
 | Create new plugin/skill | `claude /plugin-dev:create-plugin` or `codex` (skill-creator) |
+| Canonical parser/schema/database work | `codex` (`canonical-parser-db`) |
+| Canonical frontend scaffold work | `codex` (`canonical-frontend-scaffold`) |
 | Autonomous loop until done | `claude /ralph-loop` |
 | **Codebase exploration (fast)** | `opencode` (glob + grep) |
 | **Precise file editing** | `opencode` (read + edit) |

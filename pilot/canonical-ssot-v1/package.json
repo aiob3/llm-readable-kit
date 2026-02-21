@@ -1,0 +1,35 @@
+{
+  "name": "canonical-ssot-v1-pilot",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "npm run build:types && next build",
+    "start": "next start",
+    "canonical": "node scripts/run-tsx.mjs src/cli.ts",
+    "build:types": "node scripts/run-tsx.mjs scripts/generate-types.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "validate:sql": "node scripts/validate-sql.mjs",
+    "parse:sample": "./canonical parse --in examples/sample-complete.dsl --out artifacts/sample.json",
+    "validate:sample": "./canonical validate --in artifacts/sample.json --schema schema/canonical-normalized.v1.schema.json"
+  },
+  "dependencies": {
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "next": "^15.1.6",
+    "pg": "^8.13.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "@types/pg": "^8.11.10",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}
