@@ -7,21 +7,29 @@ interface CanonicalIAMCardProps {
 export function CanonicalIAMCard({ payload }: CanonicalIAMCardProps) {
   return (
     <section className="panel">
-      <h2>IAM Resolution</h2>
+      <h2>
+        IAM_RESOLUTION
+        <span className="mds-badge panel-badge-right">acl::resolved</span>
+      </h2>
       {!payload ? (
-        <p>Nenhuma resolução IAM disponível.</p>
+        <p className="timeline-empty">Nenhuma resolução IAM disponível.</p>
       ) : (
         <div className="code">
-          <p>
-            role_code: <strong>{payload.catalog_resolution.role_code}</strong> ({payload.catalog_resolution.role_label})
-          </p>
-          <p>
-            zone_level: <strong>{payload.catalog_resolution.zone_level}</strong> ({payload.catalog_resolution.zone_label})
-          </p>
+          <div className="iam-field-row">
+            <span className="iam-field-key">role_code</span>
+            <span className="iam-field-val">{payload.catalog_resolution.role_code}</span>
+            <span className="iam-field-label">({payload.catalog_resolution.role_label})</span>
+          </div>
+          <div className="iam-field-row">
+            <span className="iam-field-key">zone_level</span>
+            <span className="iam-field-val">{payload.catalog_resolution.zone_level}</span>
+            <span className="iam-field-label">({payload.catalog_resolution.zone_label})</span>
+          </div>
+          <hr className="iam-divider" />
           <div className="kv">
             {Object.entries(payload.iam_layer).map(([key, value]) => (
               <div key={key}>
-                <strong>{key}</strong>: {value}
+                <strong>{key}</strong>: {String(value)}
               </div>
             ))}
           </div>

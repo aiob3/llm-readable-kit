@@ -105,16 +105,35 @@ export default function HomePage() {
 
   return (
     <main>
-      <header style={{ marginBottom: "1rem" }}>
-        <h1>Canonical SSOT v1 Pilot</h1>
-        <p>
-          DSL textual autoral -&gt; JSON normalizado -&gt; idempotência -&gt; event log (Postgres first, fallback memory).
+      {/* ── System header — Neural Cartography identity ── */}
+      <header className="sys-header">
+        <div className="sys-header-meta">
+          <span className="sys-node-dot" />
+          <span className="sys-node-uri">node://canonical.ssot.v1</span>
+          <span className="mds-badge">PILOT</span>
+        </div>
+
+        <h1 className="sys-title">
+          canonical<span className="sys-title-sep">::</span>ssot
+          <span className="sys-title-version">v1</span>
+        </h1>
+
+        <p className="sys-subtitle">
+          DSL autoral
+          <span className="sys-arrow">→</span>
+          JSON normalizado
+          <span className="sys-arrow">→</span>
+          idempotência
+          <span className="sys-arrow">→</span>
+          event log
         </p>
       </header>
 
-      {errorText ? <div className="error">{errorText}</div> : null}
+      {errorText ? (
+        <div className="error error-block">{errorText}</div>
+      ) : null}
 
-      <div className="grid" style={{ marginTop: "1rem" }}>
+      <div className="grid grid-with-gap">
         <CanonicalInputForm
           dsl={dsl}
           onChange={setDsl}
@@ -127,7 +146,7 @@ export default function HomePage() {
         <CanonicalReviewCard payload={payload} />
       </div>
 
-      <div className="grid" style={{ marginTop: "1rem" }}>
+      <div className="grid grid-with-gap">
         <CanonicalIAMCard payload={payload} />
         <CanonicalTimeline rows={timeline} />
       </div>

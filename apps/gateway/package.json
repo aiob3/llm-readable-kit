@@ -1,0 +1,33 @@
+{
+  "name": "@monorepo/gateway",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "migrate": "tsx src/scripts/migrate.ts",
+    "db:seed": "tsx src/scripts/db-seed.ts",
+    "db:reset": "tsx src/scripts/db-reset.ts",
+    "lint": "echo 'lint'",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "fastify": "^4.25.2",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "@fastify/cookie": "^9.2.0",
+    "@fastify/cors": "^8.5.0",
+    "dotenv": "^16.4.7",
+    "@monorepo/contracts": "workspace:*",
+    "better-sqlite3": "^12.6.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "@types/node": "^20.10.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.6",
+    "tsx": "^4.7.0"
+  }
+}

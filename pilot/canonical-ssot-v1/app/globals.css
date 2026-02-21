@@ -1,49 +1,167 @@
+/* ─────────────────────────────────────────────────────────
+   Memora Design System (MDS) — Neural Cartography Theme
+   Canonical SSOT v1 Pilot — 210226-000000
+   Skills: memora-frontend + frontend-design (Anthropic)
+   ───────────────────────────────────────────────────────── */
+
 :root {
-  --bg-0: #f6f7f1;
-  --bg-1: #dce9d5;
-  --ink: #1f2a20;
-  --ink-soft: #36513d;
-  --accent: #0f7f52;
-  --accent-2: #c95d17;
-  --card: #ffffffd9;
-  --line: #b8d1bd;
+  /* MDS: Background hierarchy */
+  --mds-bg-base:     #0D0F14;
+  --mds-bg-surface:  #141720;
+  --mds-bg-elevated: #1C2030;
+  --mds-bg-overlay:  #242840;
+
+  /* MDS: Accent — graph node palette */
+  --mds-accent-primary:  #6C8EFF;
+  --mds-accent-memory:   #A78BFA;
+  --mds-accent-relation: #34D399;
+  --mds-accent-action:   #FBBF24;
+  --mds-accent-danger:   #F87171;
+
+  /* MDS: Text */
+  --mds-text-primary:   #E8EAED;
+  --mds-text-secondary: #9AA3B2;
+  --mds-text-muted:     #555E72;
+
+  /* MDS: Border */
+  --mds-border:       #2A2F42;
+  --mds-border-focus: #6C8EFF;
+
+  /* MDS: Graph glow */
+  --mds-node-glow:  rgba(108, 142, 255, 0.28);
+  --mds-edge-color: rgba(52, 211, 153, 0.55);
+
+  /* MDS: Typography */
+  --mds-font-mono: var(--font-mono), 'JetBrains Mono', ui-monospace, monospace;
+  --mds-font-ui:   var(--font-heading), system-ui, sans-serif;
+
+  --mds-font-size-xs: 11px;
+  --mds-font-size-sm: 13px;
+  --mds-font-size-md: 15px;
+  --mds-font-size-lg: 18px;
+  --mds-font-size-xl: 26px;
 }
 
-* {
+*, *::before, *::after {
   box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  color: var(--ink);
-  font-family: var(--font-heading), "Segoe UI", sans-serif;
-  background:
-    radial-gradient(1200px 600px at -10% -10%, #fff8dd 0%, transparent 70%),
-    radial-gradient(900px 400px at 110% 10%, #cde4d0 0%, transparent 65%),
-    linear-gradient(145deg, var(--bg-0), var(--bg-1));
+  color: var(--mds-text-primary);
+  font-family: var(--mds-font-ui);
+  font-size: var(--mds-font-size-md);
+  background-color: var(--mds-bg-base);
+  /* Neural graph radial atmosphere */
+  background-image:
+    radial-gradient(ellipse 900px 600px at 15% 10%, rgba(108,142,255,0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 700px 500px at 85% 80%, rgba(167,139,250,0.05) 0%, transparent 55%),
+    radial-gradient(ellipse 500px 400px at 50% 50%, rgba(52,211,153,0.03) 0%, transparent 70%);
+  background-attachment: fixed;
+}
+
+/* Subtle map-grid overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(42,47,66,0.15) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(42,47,66,0.15) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
 }
 
 main {
-  max-width: 1200px;
+  position: relative;
+  z-index: 1;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 1.5rem;
 }
 
-h1,
-h2,
-h3 {
+h1, h2, h3, h4 {
   margin: 0;
+  font-family: var(--mds-font-ui);
 }
 
+h1 {
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+h2 {
+  font-size: var(--mds-font-size-xs);
+  font-weight: 500;
+  color: var(--mds-text-muted);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-family: var(--mds-font-mono);
+}
+
+/* ── MDS Panel ──────────────────────────────────────────── */
 .panel {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 1rem;
-  box-shadow: 0 10px 30px rgba(31, 42, 32, 0.08);
+  background: var(--mds-bg-surface);
+  border: 1px solid var(--mds-border);
+  border-radius: 10px;
+  padding: 1.25rem;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
+/* Top-edge glow line */
+.panel::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 20%; right: 20%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--mds-accent-primary), transparent);
+  opacity: 0.35;
+  transition: opacity 0.25s ease, left 0.25s ease, right 0.25s ease;
+}
+
+.panel:hover {
+  border-color: rgba(108, 142, 255, 0.28);
+  box-shadow: 0 0 32px rgba(108, 142, 255, 0.06);
+}
+
+.panel:hover::before {
+  opacity: 0.65;
+  left: 5%;
+  right: 5%;
+}
+
+/* Panel-local h2 → node-label style */
+.panel h2 {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.9rem;
+  padding-bottom: 0.75rem;
+  width: 100%;
+  border-bottom: 1px solid var(--mds-border);
+  font-size: var(--mds-font-size-xs);
+  font-family: var(--mds-font-mono);
+  color: var(--mds-text-muted);
+  letter-spacing: 0.12em;
+}
+
+.panel h2::before {
+  content: '◈';
+  color: var(--mds-accent-primary);
+  font-size: 10px;
+}
+
+/* ── Grid layout ────────────────────────────────────────── */
 .grid {
   display: grid;
   grid-template-columns: 1.2fr 1fr;
@@ -51,25 +169,56 @@ h3 {
 }
 
 @media (max-width: 980px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
+  .grid { grid-template-columns: 1fr; }
 }
 
+/* ── MDS Badge ──────────────────────────────────────────── */
+.mds-badge {
+  font-family: var(--mds-font-mono);
+  font-size: var(--mds-font-size-xs);
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--mds-bg-overlay);
+  color: var(--mds-accent-primary);
+  border: 1px solid rgba(108, 142, 255, 0.22);
+  letter-spacing: 0.04em;
+}
+
+/* ── Code / mono ────────────────────────────────────────── */
 .code {
-  font-family: var(--font-mono), ui-monospace, monospace;
+  font-family: var(--mds-font-mono);
+  font-size: var(--mds-font-size-sm);
+  line-height: 1.7;
 }
 
+/* ── Textarea ───────────────────────────────────────────── */
 .textarea {
   width: 100%;
   min-height: 280px;
-  border-radius: 12px;
-  border: 1px solid var(--line);
-  padding: 0.9rem;
-  background: #ffffff;
-  font-family: var(--font-mono), ui-monospace, monospace;
+  border-radius: 8px;
+  border: 1px solid var(--mds-border);
+  padding: 1rem;
+  background: var(--mds-bg-base);
+  color: var(--mds-text-primary);
+  font-family: var(--mds-font-mono);
+  font-size: var(--mds-font-size-sm);
+  line-height: 1.7;
+  resize: vertical;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+.textarea:focus {
+  outline: none;
+  border-color: var(--mds-border-focus);
+  box-shadow: 0 0 0 3px rgba(108, 142, 255, 0.1);
+}
+
+.textarea::placeholder {
+  color: var(--mds-text-muted);
+  font-style: italic;
+}
+
+/* ── Button row ─────────────────────────────────────────── */
 .button-row {
   display: flex;
   flex-wrap: wrap;
@@ -77,41 +226,323 @@ h3 {
   margin-top: 0.75rem;
 }
 
+/* ── Buttons — edge-style (not pill) ────────────────────── */
 button {
-  border: 0;
-  border-radius: 999px;
-  padding: 0.6rem 0.9rem;
-  color: white;
-  background: linear-gradient(90deg, var(--accent), #26a96e);
+  position: relative;
+  border: 1px solid var(--mds-accent-relation);
+  border-radius: 5px;
+  padding: 0.45rem 1rem;
+  background: transparent;
+  color: var(--mds-accent-relation);
   cursor: pointer;
-  font-weight: 600;
+  font-family: var(--mds-font-mono);
+  font-size: var(--mds-font-size-xs);
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease, color 0.2s ease;
+}
+
+button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--mds-accent-relation);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+button:hover:not(:disabled) {
+  box-shadow: 0 0 14px rgba(52, 211, 153, 0.3);
+}
+
+button:hover:not(:disabled)::after {
+  opacity: 0.08;
 }
 
 button.secondary {
-  background: linear-gradient(90deg, var(--accent-2), #dc7f2b);
+  border-color: var(--mds-accent-action);
+  color: var(--mds-accent-action);
+}
+
+button.secondary::after {
+  background: var(--mds-accent-action);
+}
+
+button.secondary:hover:not(:disabled) {
+  box-shadow: 0 0 14px rgba(251, 191, 36, 0.3);
 }
 
 button:disabled {
-  opacity: 0.55;
+  opacity: 0.3;
   cursor: not-allowed;
 }
 
+/* ── Error ──────────────────────────────────────────────── */
 .error {
-  border-left: 4px solid #b01717;
-  background: #fff1f1;
-  color: #7b1212;
-  border-radius: 8px;
-  padding: 0.7rem;
+  border-left: 3px solid var(--mds-accent-danger);
+  background: rgba(248, 113, 113, 0.07);
+  color: var(--mds-accent-danger);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  font-family: var(--mds-font-mono);
+  font-size: var(--mds-font-size-sm);
+  line-height: 1.5;
 }
 
+/* ── KV grid ────────────────────────────────────────────── */
 .kv {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.3rem 1rem;
+}
+
+.kv > div {
+  font-size: var(--mds-font-size-sm);
+  color: var(--mds-text-secondary);
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(42, 47, 66, 0.6);
+}
+
+.kv strong {
+  color: var(--mds-accent-primary);
+  font-weight: 500;
+}
+
+/* ── Timeline ───────────────────────────────────────────── */
+.timeline-item {
+  position: relative;
+  padding: 0.7rem 0 0.7rem 1.25rem;
+  border-left: 2px solid var(--mds-border);
+  margin-left: 6px;
+  font-size: var(--mds-font-size-sm);
+  color: var(--mds-text-secondary);
+  transition: border-color 0.2s ease;
+}
+
+.timeline-item:hover {
+  border-left-color: rgba(108, 142, 255, 0.4);
+}
+
+/* Node dot on timeline */
+.timeline-item::before {
+  content: '';
+  position: absolute;
+  left: -5px;
+  top: 1rem;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--mds-bg-base);
+  border: 2px solid var(--mds-accent-primary);
+  box-shadow: 0 0 8px var(--mds-node-glow);
+  transition: box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.timeline-item:hover::before {
+  background: var(--mds-accent-primary);
+  box-shadow: 0 0 14px var(--mds-node-glow);
+}
+
+/* ── Page header — system identity ─────────────────────── */
+.sys-header {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--mds-border);
+  position: relative;
+}
+
+.sys-header-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 0.4rem;
+}
+
+.sys-node-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--mds-accent-primary);
+  box-shadow: 0 0 10px var(--mds-node-glow);
+  flex-shrink: 0;
+  animation: pulse-node 2.5s ease-in-out infinite;
+}
+
+@keyframes pulse-node {
+  0%, 100% { box-shadow: 0 0 10px var(--mds-node-glow); }
+  50% { box-shadow: 0 0 18px rgba(108,142,255,0.5); }
+}
+
+.sys-node-uri {
+  font-family: var(--mds-font-mono);
+  font-size: var(--mds-font-size-xs);
+  color: var(--mds-text-muted);
+  letter-spacing: 0.12em;
+}
+
+.sys-title {
+  color: var(--mds-text-primary);
+}
+
+.sys-title-sep {
+  color: var(--mds-accent-primary);
+}
+
+.sys-title-version {
+  font-family: var(--mds-font-mono);
+  font-size: 1rem;
+  color: var(--mds-text-muted);
+  font-weight: 300;
+  margin-left: 0.5rem;
+}
+
+.sys-subtitle {
+  margin-top: 0.4rem;
+  color: var(--mds-text-muted);
+  font-family: var(--mds-font-mono);
+  font-size: var(--mds-font-size-sm);
+  letter-spacing: 0.02em;
+}
+
+.sys-arrow {
+  color: var(--mds-accent-relation);
+  margin: 0 0.4rem;
+}
+
+.grid-with-gap {
+  margin-top: 1rem;
+}
+
+.error-block {
+  margin-bottom: 1rem;
+}
+
+/* ── Component-specific utilities ───────────────────────── */
+
+/* Badge pushed to right side of panel h2 */
+.panel-badge-right {
+  margin-left: auto;
+}
+
+/* Hint text below panel header */
+.panel-hint {
+  color: var(--mds-text-muted);
+  font-size: var(--mds-font-size-xs);
+  margin: 0 0 0.75rem;
+  font-family: var(--mds-font-mono);
+}
+
+.panel-hint-accent {
+  color: var(--mds-accent-primary);
+}
+
+/* Review card: JSON pre block */
+.review-pre {
+  background: var(--mds-bg-base);
+  border: 1px solid var(--mds-border);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  overflow-x: auto;
+  font-family: var(--mds-font-mono);
+  font-size: var(--mds-font-size-sm);
+  color: var(--mds-text-secondary);
+  line-height: 1.7;
+  margin: 0.5rem 0 0;
+}
+
+.review-schema-version {
+  font-family: var(--mds-font-mono);
+  font-size: var(--mds-font-size-sm);
+  color: var(--mds-text-secondary);
+  margin: 0 0 0.5rem;
+  padding: 0.4rem 0.75rem;
+  background: var(--mds-bg-elevated);
+  border-radius: 5px;
+  display: inline-flex;
+  align-items: center;
   gap: 0.5rem;
 }
 
-.timeline-item {
-  border-top: 1px dashed var(--line);
-  padding-top: 0.5rem;
-  margin-top: 0.5rem;
+.review-schema-version strong {
+  color: var(--mds-accent-memory);
+}
+
+/* IAM card fields */
+.iam-field-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  font-size: var(--mds-font-size-sm);
+  padding: 0.4rem 0;
+  border-bottom: 1px solid rgba(42,47,66,0.6);
+}
+
+.iam-field-key {
+  color: var(--mds-text-muted);
+  font-family: var(--mds-font-mono);
+  font-size: var(--mds-font-size-xs);
+  min-width: 90px;
+}
+
+.iam-field-val {
+  color: var(--mds-accent-relation);
+  font-family: var(--mds-font-mono);
+  font-weight: 500;
+}
+
+.iam-field-label {
+  color: var(--mds-text-muted);
+  font-size: var(--mds-font-size-xs);
+}
+
+.iam-divider {
+  border: none;
+  border-top: 1px solid var(--mds-border);
+  margin: 0.75rem 0;
+}
+
+/* Timeline: event source badge */
+.timeline-source {
+  color: var(--mds-accent-action);
+}
+
+.timeline-id {
+  color: var(--mds-accent-primary);
+}
+
+.timeline-ts {
+  color: var(--mds-text-muted);
+  font-size: var(--mds-font-size-xs);
+}
+
+.timeline-hash {
+  color: var(--mds-text-muted);
+  font-size: var(--mds-font-size-xs);
+}
+
+.timeline-empty {
+  color: var(--mds-text-muted);
+  font-family: var(--mds-font-mono);
+  font-size: var(--mds-font-size-sm);
+  font-style: italic;
+}
+
+/* Utility: muted text */
+.text-muted {
+  color: var(--mds-text-muted);
+}
+
+/* ── Scrollbar ──────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--mds-bg-base); }
+::-webkit-scrollbar-thumb { background: var(--mds-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--mds-text-muted); }
+
+/* ── Selection ──────────────────────────────────────────── */
+::selection {
+  background: rgba(108, 142, 255, 0.28);
+  color: var(--mds-text-primary);
 }

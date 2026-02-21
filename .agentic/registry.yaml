@@ -25,6 +25,7 @@ interfaces:
   claude:
     role: Fluxos longos (feature-dev), revisão paralela e commit assistido
     plugins_enabled:
+      - memora-context
       - code-review@claude-plugins-official
       - commit-commands@claude-plugins-official
       - feature-dev@claude-plugins-official

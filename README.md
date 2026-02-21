@@ -1,90 +1,74 @@
-# LLM Readable Kit
+# Local-first Monorepo MVP
 
-**Kit portável de extração de frameworks LLM-readable** para transformar conhecimento tácito de features de codebase em documentação estruturada e replicável.
+Monorepo com `pnpm workspaces` + `Turborepo`:
 
-Usa o protocolo **Fundation Agent** — um loop metacognitivo recursivo que gera artefatos padronizados (Feature Spec + Snippet Técnico + Guia de Adoção) a partir de qualquer feature de qualquer projeto.
+- `apps/gateway` → Node 20 + Fastify + TypeScript
+- `apps/web` → Vite + React + TypeScript
+- SQLite local em `./data/app.db`
 
----
+## Requisitos
 
-## Quick Start
+- Node.js 20+
+- pnpm 8+
+
+## Passos locais (exatos)
 
 ```bash
-# 1. Copie a pasta docs-copy/ para o seu projeto
-cp -r docs-copy/ /caminho/do/seu/projeto/docs-copy/
-
-# 2. Preencha as variáveis em docs-copy/CODEX_TASK.md
-#    FEATURE_NAME, CODEBASE_PATH, ENTRY_POINTS, TEST_FILE, TEST_COMMAND
-
-# 3. Acione o agente com docs-copy/CODEX_TASK.md como entry point
+pnpm install
+pnpm db:seed
+pnpm dev
 ```
 
-## O que é
+Depois abra:
 
-Este kit **não é um projeto de aplicação** — é um sistema de documentação/extração que:
+- Gateway: `http://localhost:3333`
+- Web: `http://localhost:5173`
 
-1. **Recebe** a indicação de uma feature + acesso ao codebase
-2. **Executa** um pipeline de 4 camadas (Ingestão → Enriquecimento → Projeção → Entrega)
-3. **Produz** um `skill.md` contendo a tríade obrigatória:
-   - **Feature Spec** — problema → solução → fluxo → critérios de aceite
-   - **Snippet Técnico** — assinatura + pseudocódigo + código real + grafo de dependências
-   - **Guia de Adoção** — pré-requisitos + passos + testes + troubleshooting
-4. **Valida** via scoring logarítmico L0-L5 (mínimo 80/100)
-5. **Aguarda** aprovação HITL (Human-in-the-Loop) — nunca auto-aprova
+Login inicial:
 
-## Estrutura do Kit
+- usuário: `admin`
+- senha: `admin123!`
 
+> Observação: o login é com `username=admin` e `password=admin123!`.
+
+## Scripts
+
+- `pnpm dev` → sobe gateway + web
+- `pnpm db:reset` → remove `./data/app.db` e `./data/artifacts`
+- `pnpm db:seed` → cria usuário admin inicial
+- `pnpm health` → verifica `GET /health`
+
+## Gates implementados
+
+- Gate 0 — Boot
+  - gateway em `:3333`, web em `:5173`, `/health` retorna ok, `/login` renderiza
+- Gate 1 — Auth
+  - `/auth/login`, `/auth/logout`, `/auth/me` + cookie `httpOnly` JWT
+- Gate 2 — RBAC
+  - roles `admin/operator/viewer` no gateway e guards no web
+- Gate 3 — Admin UI
+  - `/admin/users` (create/reset password/assign role)
+  - `/admin/integrations` (CRUD + test)
+- Gate 4 — Jobs registry
+  - `/api/jobs`, `/api/jobs/:id`, `/api/jobs/:id/events`
+  - artefatos em `./data/artifacts/<jobId>/`
+
+## Migrations
+
+- SQL em `apps/gateway/migrations/*.sql`
+- Runner idempotente aplica cada arquivo uma única vez
+- Tabela `migrations` rastreia arquivos aplicados
+
+## Variáveis de ambiente
+
+Use `.env` local baseado em `.env.example`:
+
+```env
+DATA_DIR=./data
+JWT_SECRET=dev-secret
+COOKIE_SECURE=false
 ```
-docs-copy/                         ← ESTA PASTA é copiada para projetos-alvo
-├── CODEX_TASK.md                  ← Entry point (ler PRIMEIRO)
-├── fundation-agent.prompt.md      ← Protocolo do loop metacognitivo
-├── feature-recurso-progressbar.md ← Referência estrutural (outro projeto)
-├── framework-llm-readable.semantic-export.md ← Exemplo completo (READ-ONLY)
-├── chunks/00..08-*.md             ← Instruções atômicas (carregar seletivamente)
-├── components/                    ← Pasta de ENTREGA (output → revisão HITL)
-│   ├── llm-readable.semantic-export.skill.md      ← Entregável aprovado
-│   └── llm-readable.progress-bar-1-a-1.skill.md   ← Entregável aprovado
-├── prompts/                       ← Prompts auxiliares
-├── samples/                       ← Amostras de dados
-└── reference_study_sop.md         ← Contexto histórico (opcional)
-```
 
-## Entregáveis Produzidos
+## VPS packaging later
 
-| Feature                             | Arquivo                                               | Status   |
-| ----------------------------------- | ----------------------------------------------------- | -------- |
-| Semantic Export (Visual→LLM Bridge) | `components/llm-readable.semantic-export.skill.md`    | Aprovado |
-| Progress Bar 1-a-1 (FFmpeg)         | `components/llm-readable.progress-bar-1-a-1.skill.md` | Aprovado |
-
-## Para Agentes AI
-
-Ler `.github/copilot-instructions.md` para convenções do projeto, ou ir direto para `docs-copy/CODEX_TASK.md` como entry point de execução.
-
-## Operação Multiagente Centralizada
-
-Para operação unificada entre Copilot, Codex, Claude e OpenCode:
-
-- Inventário oficial: `.agentic/registry.yaml`
-- Modelo operacional: `.agentic/centralized-operating-model.md`
-- Protocolo de memória persistente: `.agentic/MEMORA-PERSISTENT-PROTOCOL.md`
-- Logger atômico/idempotente: `.agentic/scripts/memora_ops.py`
-- Topologia MCP segura: `opencode.json` + `.opencode/.env.example`
-
-## Piloto Canonical SSOT v1 (Web + DB)
-
-Implementação de referência do framework canônico (DSL + JSON Schema + parser TS + Postgres + Next.js + CI):
-
-- Projeto piloto: `pilot/canonical-ssot-v1`
-- Especificação DSL: `pilot/canonical-ssot-v1/docs/canonical-dsl.v1.md`
-- Schema: `pilot/canonical-ssot-v1/schema/canonical-normalized.v1.schema.json`
-- Workflow de gate: `.github/workflows/canonical-validate.yml`
-- Skills dedicadas:
-  - `.opencode/skills/canonical-parser-db/SKILL.md`
-  - `.opencode/skills/canonical-frontend-scaffold/SKILL.md`
-
-## Autor
-
-brito@vcia.com.br   |   linkedin.com/in/brito1   |    indygolab.com
-
-## Licença
-
-[MIT](LICENSE)
+Empacotamento para VPS será adicionado depois (artefatos de deploy). Este MVP é intencionalmente local-first e sem arquivos de Traefik/Portainer neste momento.

@@ -21,3 +21,16 @@ desktop.ini
 .opencode/memory/
 opencode.local.json
 .agentic/active-session.json
+.mcp.json
+
+# Monorepo builds
+node_modules/
+pnpm-lock.yaml
+dist/
+build/
+.turbo/
+
+# Database
+*.db
+*.sqlite
+/data/

@@ -1,0 +1,25 @@
+{
+  "$schema": "https://turbo.build/json-schema.json",
+  "globalDependencies": ["package.json", "pnpm-lock.yaml"],
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", "build/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "outputs": []
+    },
+    "test": {
+      "outputs": ["coverage/**"],
+      "cache": false
+    },
+    "type-check": {
+      "outputs": [],
+      "cache": true
+    }
+  }
+}

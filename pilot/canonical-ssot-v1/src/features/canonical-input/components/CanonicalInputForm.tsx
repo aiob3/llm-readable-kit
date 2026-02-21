@@ -21,20 +21,25 @@ export function CanonicalInputForm({
 }: CanonicalInputFormProps) {
   return (
     <section className="panel">
-      <h2>Canonical Input DSL</h2>
-      <p>Entrada autoral no formato `[key]: value` com camada de Eventos + IAM.</p>
+      <h2>
+        DSL_INPUT
+        <span className="mds-badge panel-badge-right">canonical/dsl</span>
+      </h2>
+      <p className="code panel-hint">
+        Formato: <span className="panel-hint-accent">[key]: value</span> com camadas event + iam
+      </p>
       <textarea
         className="textarea"
         value={dsl}
         onChange={(event) => onChange(event.target.value)}
-        placeholder="Cole o payload DSL aqui"
+        placeholder={`[context]: meu-projeto\n[event_type]: user.login\n[identity]: brito\n[role]: admin\n[zone]: public`}
       />
       <div className="button-row">
         <button type="button" onClick={onLoadSample} disabled={loading}>
-          Load sample
+          load_sample
         </button>
         <button type="button" onClick={onParse} disabled={loading || !dsl.trim()}>
-          Parse + validate
+          parse + validate
         </button>
         <button
           type="button"
@@ -42,7 +47,7 @@ export function CanonicalInputForm({
           onClick={onPersist}
           disabled={loading || !canPersist}
         >
-          Persist event
+          persist_event
         </button>
       </div>
     </section>
