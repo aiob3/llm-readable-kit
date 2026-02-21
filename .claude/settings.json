@@ -1,4 +1,13 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File \"g:\\\\projetos\\\\docs-copy\\\\.opencode\\\\sync-and-start.ps1\")",
+      "Bash(powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command \"Test-Path ''g:\\\\projetos\\\\docs-copy\\\\.opencode\\\\.venv-memora\\\\Scripts\\\\python.exe''; Get-PSDrive G\")",
+      "Bash(bash \"g:/projetos/docs-copy/.opencode/start-memora-graph.sh\")",
+      "Bash(curl:*)",
+      "Bash(wsl.exe --version:*)"
+    ]
+  },
   "enabledPlugins": {
     "code-review@claude-plugins-official": true,
     "commit-commands@claude-plugins-official": true,

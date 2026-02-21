@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Memora Causal Observer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+
+  <style>
+    /* ─── Design System: Deep Ops Dark ─── */
+    :root {
+      --bg-void:      #050709;
+      --bg-base:      #080C11;
+      --bg-panel:     #0D1520;
+      --bg-elevated:  #121F30;
+      --bg-bucket:    #0A1A2E;
+      --bg-hover:     #162435;
+
+      --color-root:     #FFD166;
+      --color-session:  #06B6D4;
+      --color-ws:       #4ADE80;
+      --color-current:  #00FFC8;
+      --color-hidden:   #2A3A4E;
+      --color-danger:   #F87171;
+
+      --edge-enables:    rgba(74,222,128,0.75);
+      --edge-refines:    rgba(96,165,250,0.75);
+      --edge-validates:  rgba(251,191,36,0.75);
+      --edge-implements: rgba(167,139,250,0.75);
+      --edge-depends-on: rgba(248,113,113,0.75);
+      --edge-contains:   rgba(6,182,212,0.5);
+      --edge-default:    rgba(100,140,180,0.5);
+      --edge-pulse:      #00FFC8;
+
+      --text-primary:   #CDD9E5;
+      --text-secondary: #6B85A0;
+      --text-accent:    #79C0FF;
+      --text-muted:     #2E4055;
+      --text-root:      #FFD166;
+      --text-current:   #00FFC8;
+
+      --border:         #1A2A3E;
+      --border-active:  #2A4060;
+      --border-focus:   #006D9C;
+
+      --font-display: 'Syne', sans-serif;
+      --font-data:    'JetBrains Mono', monospace;
+
+      --radius:     6px;
+      --radius-lg:  10px;
+      --header-h:   52px;
+      --sidebar-w:  240px;
+      --details-h:  140px;
+      --anim-fast:  150ms;
+      --anim-mid:   320ms;
+      --anim-slow:  600ms;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%; height: 100%;
+      background: var(--bg-void);
+      color: var(--text-primary);
+      font-family: var(--font-display);
+      overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─── Grain overlay ─── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+      opacity: 0.6;
+    }
+
+    /* ─── Layout ─── */
+    #app {
+      position: relative; z-index: 1;
+      display: grid;
+      grid-template-rows: var(--header-h) 1fr var(--details-h);
+      grid-template-columns: var(--sidebar-w) 1fr;
+      grid-template-areas:
+        "header  header"
+        "sidebar canvas"
+        "details details";
+      width: 100vw; height: 100vh;
+    }
+
+    /* ─── Header ─── */
+    #header {
+      grid-area: header;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px;
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border);
+      gap: 16px;
+    }
+
+    .header-brand {
+      display: flex; align-items: center; gap: 10px;
+    }
+
+    .brand-dot {
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      background: var(--color-current);
+      box-shadow: 0 0 8px var(--color-current);
+      animation: dot-pulse 2.4s ease-in-out infinite;
+    }
+    .brand-dot.offline {
+      background: var(--color-danger);
+      box-shadow: 0 0 8px var(--color-danger);
+      animation: none;
+    }
+
+    .brand-title {
+      font-size: 13px; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--text-primary);
+    }
+    .brand-sub {
+      font-family: var(--font-data); font-size: 10px;
+      color: var(--text-secondary); letter-spacing: 0.08em;
+    }
+
+    .header-controls {
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .ctrl-btn {
+      font-family: var(--font-data); font-size: 10px; font-weight: 500;
+      padding: 4px 10px; border-radius: var(--radius);
+      border: 1px solid var(--border-active);
+      background: transparent; color: var(--text-secondary);
+      cursor: pointer; letter-spacing: 0.06em;
+      transition: all var(--anim-fast);
+    }
+    .ctrl-btn:hover { border-color: var(--border-focus); color: var(--text-primary); background: var(--bg-elevated); }
+    .ctrl-btn.active { border-color: var(--color-session); color: var(--color-session); }
+
+    .header-timestamp {
+      font-family: var(--font-data); font-size: 10px;
+      color: var(--text-muted); letter-spacing: 0.05em;
+    }
+
+    .live-badge {
+      display: flex; align-items: center; gap: 5px;
+      font-family: var(--font-data); font-size: 10px; font-weight: 500;
+      color: var(--color-current); letter-spacing: 0.08em;
+    }
+    .live-badge.offline { color: var(--color-danger); }
+
+    /* ─── Sidebar ─── */
+    #sidebar {
+      grid-area: sidebar;
+      background: var(--bg-panel);
+      border-right: 1px solid var(--border);
+      overflow-y: auto; overflow-x: hidden;
+      display: flex; flex-direction: column;
+    }
+    #sidebar::-webkit-scrollbar { width: 3px; }
+    #sidebar::-webkit-scrollbar-track { background: transparent; }
+    #sidebar::-webkit-scrollbar-thumb { background: var(--border-active); border-radius: 2px; }
+
+    .sidebar-section-header {
+      padding: 12px 14px 6px;
+      font-size: 9px; font-weight: 700; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .bucket-group {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .bucket-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 14px; cursor: pointer;
+      transition: background var(--anim-fast);
+    }
+    .bucket-header:hover { background: var(--bg-hover); }
+    .bucket-header.current { background: rgba(0,255,200,0.05); }
+
+    .bucket-label {
+      font-family: var(--font-data); font-size: 10px;
+      color: var(--text-secondary);
+    }
+    .bucket-label.current { color: var(--text-current); }
+
+    .bucket-count {
+      font-family: var(--font-data); font-size: 9px;
+      color: var(--text-muted);
+      background: var(--bg-elevated);
+      padding: 1px 6px; border-radius: 10px;
+    }
+
+    .bucket-nodes { padding: 2px 0; }
+
+    .sidebar-node {
+      display: flex; align-items: center; gap: 8px;
+      padding: 5px 14px 5px 22px; cursor: pointer;
+      transition: all var(--anim-fast);
+      border-left: 2px solid transparent;
+    }
+    .sidebar-node:hover { background: var(--bg-hover); }
+    .sidebar-node.selected {
+      background: rgba(121,192,255,0.08);
+      border-left-color: var(--text-accent);
+    }
+    .sidebar-node.current-node {
+      border-left-color: var(--color-current);
+    }
+
+    .node-dot {
+      width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+    }
+    .sidebar-node-label {
+      font-size: 11px; color: var(--text-secondary);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      flex: 1;
+    }
+    .sidebar-node.selected .sidebar-node-label { color: var(--text-primary); }
+    .sidebar-node.current-node .sidebar-node-label { color: var(--text-current); }
+
+    /* Legend */
+    .legend {
+      padding: 10px 14px;
+      margin-top: auto;
+      border-top: 1px solid var(--border);
+    }
+    .legend-title {
+      font-size: 9px; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .legend-item {
+      display: flex; align-items: center; gap: 7px;
+      font-family: var(--font-data); font-size: 9px;
+      color: var(--text-secondary); margin-bottom: 4px;
+    }
+    .legend-line {
+      width: 18px; height: 2px; border-radius: 1px; flex-shrink: 0;
+    }
+
+    /* ─── Canvas ─── */
+    #canvas {
+      grid-area: canvas;
+      background: var(--bg-base);
+      position: relative; overflow: hidden;
+    }
+
+    #graph-svg {
+      width: 100%; height: 100%;
+      cursor: grab;
+    }
+    #graph-svg:active { cursor: grabbing; }
+
+    /* ─── SVG styles ─── */
+    .link {
+      fill: none; stroke-width: 1.5;
+      transition: stroke-opacity var(--anim-fast);
+    }
+    .link.dimmed { stroke-opacity: 0.1 !important; }
+    .link.highlighted {
+      stroke-width: 2.5;
+      stroke-opacity: 1 !important;
+    }
+    .link.pulsing {
+      stroke-dasharray: 200;
+      animation: link-pulse var(--anim-slow) ease forwards;
+    }
+
+    .node-group { cursor: pointer; }
+    .node-group .node-circle {
+      transition: r var(--anim-fast), filter var(--anim-fast);
+    }
+    .node-group:hover .node-circle {
+      filter: brightness(1.3);
+    }
+    .node-group.dimmed { opacity: 0.15; }
+    .node-group.selected .node-circle {
+      stroke: var(--text-accent); stroke-width: 2;
+    }
+    .node-group.current-node .node-circle {
+      stroke: var(--color-current); stroke-width: 2;
+      filter: drop-shadow(0 0 8px var(--color-current));
+      animation: node-pulse 2s ease-in-out infinite;
+    }
+    .node-group.root-node .node-circle {
+      stroke: var(--color-root); stroke-width: 2;
+      filter: drop-shadow(0 0 6px color-mix(in srgb, var(--color-root) 50%, transparent));
+    }
+
+    .node-label {
+      font-family: var(--font-display); font-size: 10px;
+      fill: var(--text-secondary); pointer-events: none;
+      text-anchor: middle;
+    }
+    .node-group:hover .node-label, .node-group.selected .node-label { fill: var(--text-primary); }
+    .node-group.current-node .node-label { fill: var(--color-current); }
+    .node-group.root-node .node-label { fill: var(--color-root); }
+
+    .bucket-rect {
+      fill: var(--bg-bucket); rx: 6; ry: 6;
+      stroke: var(--border); stroke-width: 1;
+    }
+    .bucket-rect.current-bucket { stroke: rgba(0,255,200,0.3); }
+
+    .bucket-label-text {
+      font-family: var(--font-data); font-size: 9px;
+      fill: var(--text-muted); text-anchor: middle;
+    }
+    .bucket-label-text.current-bucket { fill: var(--text-current); }
+
+    /* Edge type labels */
+    .edge-label {
+      font-family: var(--font-data); font-size: 8px;
+      fill: var(--text-muted); pointer-events: none;
+    }
+
+    /* ─── Tooltip ─── */
+    #tooltip {
+      position: fixed; z-index: 100;
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-active);
+      border-radius: var(--radius);
+      padding: 8px 12px;
+      pointer-events: none;
+      opacity: 0; transition: opacity var(--anim-fast);
+      max-width: 240px;
+    }
+    #tooltip.visible { opacity: 1; }
+
+    .tooltip-label {
+      font-size: 12px; font-weight: 600; color: var(--text-primary);
+      margin-bottom: 4px;
+    }
+    .tooltip-meta {
+      font-family: var(--font-data); font-size: 9px;
+      color: var(--text-secondary); line-height: 1.6;
+    }
+    .tooltip-badge {
+      display: inline-block; padding: 1px 6px;
+      border-radius: 3px; font-size: 8px; font-weight: 600;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      margin-right: 4px;
+    }
+
+    /* ─── Details panel ─── */
+    #details {
+      grid-area: details;
+      background: var(--bg-panel);
+      border-top: 1px solid var(--border);
+      display: flex; align-items: stretch;
+      overflow: hidden;
+    }
+
+    .details-empty {
+      display: flex; align-items: center; justify-content: center;
+      width: 100%; font-family: var(--font-data); font-size: 11px;
+      color: var(--text-muted); letter-spacing: 0.06em;
+    }
+
+    .details-content {
+      display: flex; width: 100%; gap: 0;
+    }
+
+    .detail-col {
+      padding: 12px 16px; border-right: 1px solid var(--border);
+      min-width: 200px;
+    }
+    .detail-col:last-child { border-right: none; flex: 1; }
+
+    .detail-label {
+      font-size: 9px; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .detail-value {
+      font-family: var(--font-data); font-size: 11px;
+      color: var(--text-primary); line-height: 1.5;
+    }
+    .detail-value.accent { color: var(--text-accent); }
+    .detail-value.current { color: var(--text-current); }
+    .detail-value.root { color: var(--text-root); }
+
+    .detail-path {
+      display: flex; align-items: center; gap: 4px;
+      flex-wrap: wrap;
+    }
+    .path-crumb {
+      font-family: var(--font-data); font-size: 10px;
+      color: var(--text-secondary);
+    }
+    .path-arrow {
+      font-size: 9px; color: var(--text-muted);
+    }
+    .path-crumb.active { color: var(--text-current); }
+
+    .detail-edges {
+      display: flex; flex-wrap: wrap; gap: 5px;
+    }
+    .edge-chip {
+      font-family: var(--font-data); font-size: 9px;
+      padding: 2px 7px; border-radius: 3px;
+      background: var(--bg-elevated);
+    }
+
+    /* ─── Loading / Error overlays ─── */
+    #overlay {
+      position: absolute; inset: 0; z-index: 50;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: var(--bg-base);
+      gap: 12px;
+    }
+    #overlay.hidden { display: none; }
+
+    .overlay-title {
+      font-size: 14px; font-weight: 600; color: var(--text-primary);
+    }
+    .overlay-sub {
+      font-family: var(--font-data); font-size: 11px;
+      color: var(--text-secondary); text-align: center; max-width: 340px;
+    }
+    .overlay-error { color: var(--color-danger); }
+
+    .spinner {
+      width: 28px; height: 28px;
+      border: 2px solid var(--border-active);
+      border-top-color: var(--color-session);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    /* ─── Animations ─── */
+    @keyframes dot-pulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 8px var(--color-current); }
+      50% { opacity: 0.5; box-shadow: 0 0 3px var(--color-current); }
+    }
+    @keyframes node-pulse {
+      0%, 100% { filter: drop-shadow(0 0 6px var(--color-current)); }
+      50% { filter: drop-shadow(0 0 14px var(--color-current)); }
+    }
+    @keyframes link-pulse {
+      from { stroke-dashoffset: 200; }
+      to { stroke-dashoffset: 0; }
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    @keyframes node-appear {
+      from { opacity: 0; transform: scale(0.5); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes fade-in {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HEADER -->
+  <header id="header">
+    <div class="header-brand">
+      <div class="brand-dot" id="live-dot"></div>
+      <div>
+        <div class="brand-title">Memora Causal Observer</div>
+        <div class="brand-sub" id="header-sub">conectando…</div>
+      </div>
+    </div>
+
+    <div class="header-controls">
+      <button class="ctrl-btn active" id="btn-toggle-root" title="Mostrar/ocultar conexões do nó raiz">
+        raiz visível
+      </button>
+      <button class="ctrl-btn" id="btn-reset-zoom" title="Centralizar visualização">
+        reset zoom
+      </button>
+      <button class="ctrl-btn" id="btn-highlight-path" title="Destacar caminho ativo">
+        caminho ativo
+      </button>
+    </div>
+
+    <div style="display:flex; align-items:center; gap:12px;">
+      <span class="live-badge" id="live-badge">● LIVE</span>
+      <span class="header-timestamp" id="clock"></span>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div class="sidebar-section-header">Sessões / Buckets</div>
+    <div id="sidebar-buckets"></div>
+    <div class="legend" id="legend"></div>
+  </aside>
+
+  <!-- CANVAS -->
+  <main id="canvas">
+    <div id="overlay">
+      <div class="spinner"></div>
+      <div class="overlay-title">Carregando dados</div>
+      <div class="overlay-sub" id="overlay-msg">Conectando ao servidor Memora…</div>
+    </div>
+    <svg id="graph-svg">
+      <defs>
+        <marker id="arrow-default" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L6,3 z" fill="rgba(100,140,180,0.5)" />
+        </marker>
+        <marker id="arrow-enables" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L6,3 z" fill="rgba(74,222,128,0.75)" />
+        </marker>
+        <marker id="arrow-refines" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L6,3 z" fill="rgba(96,165,250,0.75)" />
+        </marker>
+        <marker id="arrow-validates" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L6,3 z" fill="rgba(251,191,36,0.75)" />
+        </marker>
+        <marker id="arrow-implements" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L6,3 z" fill="rgba(167,139,250,0.75)" />
+        </marker>
+        <marker id="arrow-depends_on" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L6,3 z" fill="rgba(248,113,113,0.75)" />
+        </marker>
+        <marker id="arrow-contains" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L6,3 z" fill="rgba(6,182,212,0.5)" />
+        </marker>
+        <marker id="arrow-pulse" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L6,3 z" fill="#00FFC8" />
+        </marker>
+      </defs>
+      <g id="zoom-group">
+        <g id="links-group"></g>
+        <g id="nodes-group"></g>
+        <g id="buckets-group"></g>
+      </g>
+    </svg>
+    <div id="tooltip"></div>
+  </main>
+
+  <!-- DETAILS -->
+  <footer id="details">
+    <div class="details-empty" id="details-empty">
+      ← selecione um nó para ver detalhes
+    </div>
+    <div class="details-content hidden" id="details-content"></div>
+  </footer>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   MEMORA CAUSAL OBSERVER — v2.0
+   Deep Ops Dark · Syne + JetBrains Mono · D3 Tree
+   ═══════════════════════════════════════════════ */
+
+// ─── Config ────────────────────────────────────
+const API_URL       = 'http://127.0.0.1:8765/api/graph';
+const POLL_INTERVAL = 30_000;
+const NODE_R_MIN    = 5;
+const NODE_R_MAX    = 14;
+const BUCKET_H      = 28;
+const BUCKET_PAD_X  = 20;
+const H_GAP         = 90;   // vertical spacing between tree levels
+const NODE_PAD_Y    = 40;   // padding inside buckets
+
+// ─── Edge colors ───────────────────────────────
+const EDGE_COLOR = {
+  enables:    'rgba(74,222,128,0.75)',
+  refines:    'rgba(96,165,250,0.75)',
+  validates:  'rgba(251,191,36,0.75)',
+  implements: 'rgba(167,139,250,0.75)',
+  depends_on: 'rgba(248,113,113,0.75)',
+  contains:   'rgba(6,182,212,0.4)',
+  default:    'rgba(100,140,180,0.4)',
+};
+
+// ─── Node colors ───────────────────────────────
+const NODE_COLOR = {
+  entity:   '#6C8EFF',
+  memory:   '#A78BFA',
+  action:   '#FBBF24',
+  session:  '#06B6D4',
+  project:  '#FFD166',
+  default:  '#4ADE80',
+};
+
+// ─── State ─────────────────────────────────────
+let graphData        = null;
+let selectedNodeId   = null;
+let showRootEdges    = true;
+let pollTimer        = null;
+let zoomBehavior     = null;
+let svgTransform     = null;
+let latestNodeId     = null;
+let treeRoot         = null;
+let nodeById         = {};
+
+// ─── DOM refs ──────────────────────────────────
+const svg            = d3.select('#graph-svg');
+const zoomGroup      = d3.select('#zoom-group');
+const linksGroup     = d3.select('#links-group');
+const nodesGroup     = d3.select('#nodes-group');
+const bucketsGroup   = d3.select('#buckets-group');
+const tooltip        = document.getElementById('tooltip');
+const overlay        = document.getElementById('overlay');
+const overlayMsg     = document.getElementById('overlay-msg');
+const liveDoc        = document.getElementById('live-dot');
+const liveBadge      = document.getElementById('live-badge');
+const headerSub      = document.getElementById('header-sub');
+const sidebarBuckets = document.getElementById('sidebar-buckets');
+const detailsEmpty   = document.getElementById('details-empty');
+const detailsContent = document.getElementById('details-content');
+const legend         = document.getElementById('legend');
+
+// ─── Clock ─────────────────────────────────────
+function tickClock() {
+  document.getElementById('clock').textContent =
+    new Date().toLocaleString('pt-BR', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+setInterval(tickClock, 1000);
+tickClock();
+
+// ─── Utility ───────────────────────────────────
+function edgeColor(type) {
+  return EDGE_COLOR[type] || EDGE_COLOR.default;
+}
+function edgeMarker(type) {
+  const known = ['enables','refines','validates','implements','depends_on','contains'];
+  return `url(#arrow-${known.includes(type) ? type : 'default'})`;
+}
+function nodeColor(n) {
+  const type = (n.data?.type || n.type || 'default').toLowerCase();
+  const code = (n.data?.causalCode || n.causalCode || '').toLowerCase();
+  if (code.includes('project') || code === '1.0') return NODE_COLOR.project;
+  if (code.startsWith('session') || code.match(/^\d+\.\d+$/)) return NODE_COLOR.session;
+  return NODE_COLOR[type] || NODE_COLOR.default;
+}
+function nodeRadius(n) {
+  const count = n.data?.observations?.length || n.observations?.length || 0;
+  const base = Math.min(NODE_R_MAX, NODE_R_MIN + Math.sqrt(count) * 1.5);
+  return base;
+}
+function truncate(str, max = 22) {
+  return str && str.length > max ? str.slice(0, max) + '…' : (str || '');
+}
+function fmt(iso) {
+  if (!iso) return '—';
+  try { return new Date(iso).toLocaleString('pt-BR', {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); }
+  catch { return iso; }
+}
+
+// ─── Build tree from causalTree + nodes ────────
+function buildHierarchy(data) {
+  const nodes = data.nodes || [];
+  nodeById = {};
+  nodes.forEach(n => { nodeById[String(n.id)] = n; });
+  latestNodeId = data.latestMemory?.id != null ? String(data.latestMemory.id) : null;
+
+  // Use causalTree if available
+  if (data.causalTree && data.causalTree.length > 0) {
+    const rawTree = data.causalTree[0] || data.causalTree;
+    return enrichCausalTree(rawTree, nodes);
+  }
+
+  // Fallback: build tree from edges
+  return buildFallbackTree(nodes, data.edges || []);
+}
+
+function enrichCausalTree(treeNode, allNodes) {
+  // Map real node data onto the causal tree via causalCode
+  const byCode = {};
+  allNodes.forEach(n => {
+    const code = String(n.causalCode || '');
+    if (!byCode[code]) byCode[code] = [];
+    byCode[code].push(n);
+  });
+
+  function enrich(node) {
+    const realNodes = byCode[node.code] || [];
+    const merged = {
+      ...node,
+      realNodes,
+      label: realNodes.length > 0 ? realNodes[0].label : (node.label || node.code),
+      observations: realNodes.flatMap(n => n.observations || []),
+      created_at: realNodes.length > 0 ? realNodes[0].created_at : null,
+      type: realNodes.length > 0 ? realNodes[0].type : 'memory',
+      children: (node.children || []).map(enrich),
+    };
+    return merged;
+  }
+
+  return d3.hierarchy(enrich(treeNode));
+}
+
+function buildFallbackTree(nodes, edges) {
+  if (!nodes.length) return null;
+  const childSet = new Set(edges.map(e => String(e.to || e.target)));
+  const roots = nodes.filter(n => !childSet.has(String(n.id)));
+  const root = roots.length ? roots[0] : nodes[0];
+
+  const childrenOf = {};
+  edges.forEach(e => {
+    const src = String(e.from || e.source);
+    const tgt = String(e.to || e.target);
+    if (!childrenOf[src]) childrenOf[src] = [];
+    childrenOf[src].push({ id: tgt, type: e.type || e.rel_type || 'default' });
+  });
+
+  function makeNode(id, visited = new Set()) {
+    if (visited.has(id)) return null;
+    visited.add(id);
+    const n = nodeById[id];
+    if (!n) return null;
+    const kids = (childrenOf[id] || [])
+      .map(c => makeNode(c.id, new Set(visited)))
+      .filter(Boolean);
+    return { ...n, realNodes: [n], children: kids };
+  }
+
+  const tree = makeNode(String(root.id));
+  return tree ? d3.hierarchy(tree) : null;
+}
+
+// ─── Render SVG ────────────────────────────────
+function renderGraph(data) {
+  const w = document.getElementById('canvas').clientWidth;
+  const h = document.getElementById('canvas').clientHeight;
+
+  const hier = buildHierarchy(data);
+  treeRoot = hier;
+  if (!hier) return;
+
+  // D3 tree layout — top-down
+  const treeLayout = d3.tree()
+    .size([w - 80, h - 100])
+    .separation((a, b) => a.parent === b.parent ? 1.8 : 2.5);
+
+  treeLayout(hier);
+
+  // Collect edges from raw data for overlay
+  const rawEdges = (data.edges || []).map(e => ({
+    from: String(e.from || e.source),
+    to:   String(e.to || e.target),
+    type: e.type || e.rel_type || 'default',
+  }));
+
+  // ── Bucket backgrounds ──
+  bucketsGroup.selectAll('.bucket-bg').remove();
+  const depthGroups = d3.group(hier.descendants(), d => d.depth);
+  depthGroups.forEach((nodes_, depth) => {
+    if (depth === 0) return;
+    const xs = nodes_.map(d => d.x);
+    const ys = nodes_.map(d => d.y);
+    const xMin = Math.min(...xs) - BUCKET_PAD_X;
+    const xMax = Math.max(...xs) + BUCKET_PAD_X;
+    const yMin = Math.min(...ys) - NODE_PAD_Y;
+    const yMax = Math.max(...ys) + NODE_PAD_Y + BUCKET_H;
+    const isCurrent = depth === Math.max(...hier.descendants().map(d => d.depth));
+
+    bucketsGroup.append('rect')
+      .attr('class', `bucket-bg bucket-rect${isCurrent ? ' current-bucket' : ''}`)
+      .attr('x', xMin + 40)
+      .attr('y', yMin + 40)
+      .attr('width', xMax - xMin)
+      .attr('height', yMax - yMin)
+      .attr('rx', 8).attr('ry', 8);
+
+    bucketsGroup.append('text')
+      .attr('class', `bucket-label-text${isCurrent ? ' current-bucket' : ''}`)
+      .attr('x', (xMin + xMax) / 2 + 40)
+      .attr('y', yMin + 55)
+      .text(isCurrent ? `● nível ${depth} — ATUAL` : `nível ${depth}`);
+  });
+
+  // ── Links ──
+  const linkData = hier.links();
+
+  linksGroup.selectAll('.link').remove();
+  linksGroup.selectAll('.link')
+    .data(linkData)
+    .enter()
+    .append('path')
+    .attr('class', 'link')
+    .attr('id', (d,i) => `link-${i}`)
+    .attr('d', d3.linkVertical()
+      .x(d => d.x + 40)
+      .y(d => d.y + 50)
+    )
+    .attr('stroke', d => {
+      const type = d.target.data.rel_type || 'default';
+      return edgeColor(type);
+    })
+    .attr('marker-end', d => {
+      const type = d.target.data.rel_type || 'default';
+      return edgeMarker(type);
+    })
+    .attr('data-source', d => d.source.data.code || d.source.data.id)
+    .attr('data-target', d => d.target.data.code || d.target.data.id)
+    .on('mouseenter', function(event, d) {
+      const type = d.target.data.rel_type || 'default';
+      showTooltip(event, `<span class="tooltip-badge" style="background:${edgeColor(type)};color:#000">${type}</span>`);
+    })
+    .on('mouseleave', hideTooltip);
+
+  // ── Nodes ──
+  nodesGroup.selectAll('.node-group').remove();
+  const nodeGs = nodesGroup.selectAll('.node-group')
+    .data(hier.descendants())
+    .enter()
+    .append('g')
+    .attr('class', d => {
+      const isRoot = d.depth === 0;
+      const isCurrent = d.data.realNodes?.some(n => String(n.id) === latestNodeId);
+      return `node-group${isRoot ? ' root-node' : ''}${isCurrent ? ' current-node' : ''}`;
+    })
+    .attr('transform', d => `translate(${d.x + 40}, ${d.y + 50})`)
+    .attr('data-code', d => d.data.code || d.data.id)
+    .style('animation', (d,i) => `node-appear ${200 + i * 30}ms ease forwards`)
+    .on('mouseenter', function(event, d) {
+      showNodeTooltip(event, d);
+    })
+    .on('mouseleave', hideTooltip)
+    .on('click', function(event, d) {
+      event.stopPropagation();
+      selectNode(d);
+    });
+
+  nodeGs.append('circle')
+    .attr('class', 'node-circle')
+    .attr('r', d => nodeRadius(d))
+    .attr('fill', d => nodeColor(d));
+
+  nodeGs.append('text')
+    .attr('class', 'node-label')
+    .attr('y', d => nodeRadius(d) + 12)
+    .text(d => truncate(d.data.label || d.data.code));
+
+  // Click on canvas to deselect
+  svg.on('click', () => { selectedNodeId = null; updateSelection(); clearDetails(); });
+}
+
+// ─── Zoom / Pan ────────────────────────────────
+function initZoom() {
+  zoomBehavior = d3.zoom()
+    .scaleExtent([0.2, 4])
+    .on('zoom', event => {
+      svgTransform = event.transform;
+      zoomGroup.attr('transform', event.transform);
+    });
+  svg.call(zoomBehavior);
+}
+
+function resetZoom() {
+  svg.transition().duration(400)
+    .call(zoomBehavior.transform, d3.zoomIdentity.translate(0, 30).scale(0.85));
+}
+
+// ─── Selection + Highlighting ──────────────────
+function selectNode(d) {
+  selectedNodeId = d.data.code || (d.data.realNodes?.[0]?.id) || d.data.id;
+  updateSelection();
+  showDetails(d);
+  animateCausalPath(d);
+}
+
+function updateSelection() {
+  nodesGroup.selectAll('.node-group')
+    .classed('selected', d => {
+      const id = d.data.code || d.data.id;
+      return id === selectedNodeId;
+    })
+    .classed('dimmed', d => {
+      if (!selectedNodeId) return false;
+      const id = d.data.code || d.data.id;
+      return id !== selectedNodeId;
+    });
+
+  linksGroup.selectAll('.link')
+    .classed('dimmed', selectedNodeId ? true : false)
+    .classed('highlighted', false);
+}
+
+function animateCausalPath(d) {
+  // Get ancestors path
+  const ancestors = d.ancestors().reverse();
+  const ancestorCodes = new Set(ancestors.map(a => a.data.code || a.data.id));
+
+  // Un-dim and highlight links along path
+  linksGroup.selectAll('.link')
+    .classed('dimmed', function() {
+      const src = this.dataset.source;
+      const tgt = this.dataset.target;
+      return !(ancestorCodes.has(src) && ancestorCodes.has(tgt));
+    })
+    .classed('highlighted', false)
+    .classed('pulsing', false);
+
+  // Staggered pulse on path links
+  linksGroup.selectAll('.link')
+    .filter(function() {
+      const src = this.dataset.source;
+      const tgt = this.dataset.target;
+      return ancestorCodes.has(src) && ancestorCodes.has(tgt);
+    })
+    .classed('highlighted', true)
+    .attr('stroke', EDGE_COLOR.default) // brief reset
+    .each(function(d_, i) {
+      const el = this;
+      setTimeout(() => {
+        el.classList.add('pulsing');
+        el.style.stroke = '#00FFC8';
+        el.setAttribute('marker-end', 'url(#arrow-pulse)');
+        setTimeout(() => {
+          el.classList.remove('pulsing');
+          const type = d_.target?.data?.rel_type || 'default';
+          el.style.stroke = edgeColor(type);
+          el.setAttribute('marker-end', edgeMarker(type));
+        }, 700);
+      }, i * 160);
+    });
+
+  // Un-dim ancestor nodes
+  nodesGroup.selectAll('.node-group')
+    .classed('dimmed', d_ => {
+      const code = d_.data.code || d_.data.id;
+      return !ancestorCodes.has(code);
+    });
+}
+
+// ─── Highlight full active path ────────────────
+function highlightActivePath() {
+  if (!treeRoot || !latestNodeId) return;
+  const latestNode = treeRoot.descendants().find(d =>
+    d.data.realNodes?.some(n => String(n.id) === latestNodeId)
+  );
+  if (latestNode) selectNode(latestNode);
+}
+
+// ─── Root edge toggle ──────────────────────────
+function toggleRootEdges() {
+  showRootEdges = !showRootEdges;
+  document.getElementById('btn-toggle-root').textContent =
+    showRootEdges ? 'raiz visível' : 'raiz oculta';
+  document.getElementById('btn-toggle-root').classList.toggle('active', showRootEdges);
+
+  linksGroup.selectAll('.link')
+    .filter(function() {
+      return this.dataset.source === (treeRoot?.data?.code || treeRoot?.data?.id);
+    })
+    .style('opacity', showRootEdges ? null : '0');
+}
+
+// ─── Tooltip ───────────────────────────────────
+function showTooltip(event, html) {
+  tooltip.innerHTML = html;
+  tooltip.classList.add('visible');
+  moveTooltip(event);
+}
+
+function showNodeTooltip(event, d) {
+  const label = d.data.label || d.data.code;
+  const type  = d.data.type || 'memory';
+  const obs   = d.data.observations?.length || 0;
+  const when  = fmt(d.data.created_at);
+  const color = nodeColor(d);
+  showTooltip(event, `
+    <div class="tooltip-label">${label}</div>
+    <div class="tooltip-meta">
+      <span class="tooltip-badge" style="background:${color}22;color:${color};border:1px solid ${color}44">${type}</span>
+      ${obs} obs · ${when}
+    </div>
+  `);
+}
+
+function hideTooltip() {
+  tooltip.classList.remove('visible');
+}
+
+function moveTooltip(event) {
+  const x = event.clientX + 12;
+  const y = event.clientY + 12;
+  tooltip.style.left = x + 'px';
+  tooltip.style.top  = y + 'px';
+}
+document.addEventListener('mousemove', e => {
+  if (tooltip.classList.contains('visible')) moveTooltip(e);
+});
+
+// ─── Details panel ─────────────────────────────
+function showDetails(d) {
+  const node = d.data;
+  const label = node.label || node.code;
+  const type  = node.type || 'memory';
+  const obs   = node.observations || [];
+  const path  = d.ancestors().reverse().map(a => a.data.label || a.data.code);
+  const isCurrent = d.data.realNodes?.some(n => String(n.id) === latestNodeId);
+  const isRoot = d.depth === 0;
+
+  const edgesIn  = (graphData?.edges || []).filter(e => String(e.to || e.target) === String(node.realNodes?.[0]?.id));
+  const edgesOut = (graphData?.edges || []).filter(e => String(e.from || e.source) === String(node.realNodes?.[0]?.id));
+
+  detailsEmpty.classList.add('hidden');
+  detailsContent.classList.remove('hidden');
+  detailsContent.innerHTML = `
+    <div class="detail-col">
+      <div class="detail-label">Nó selecionado</div>
+      <div class="detail-value ${isCurrent ? 'current' : isRoot ? 'root' : 'accent'}">${label}</div>
+      <div class="detail-value" style="font-size:9px;margin-top:4px;color:var(--text-secondary)">${type} · ${obs.length} observações</div>
+    </div>
+    <div class="detail-col">
+      <div class="detail-label">Caminho causal</div>
+      <div class="detail-path">
+        ${path.map((p, i) => `
+          <span class="path-crumb ${i === path.length - 1 ? 'active' : ''}">${truncate(p, 18)}</span>
+          ${i < path.length - 1 ? '<span class="path-arrow">→</span>' : ''}
+        `).join('')}
+      </div>
+    </div>
+    <div class="detail-col">
+      <div class="detail-label">Conexões de entrada</div>
+      <div class="detail-edges">
+        ${edgesIn.length ? edgesIn.slice(0,6).map(e =>
+          `<span class="edge-chip" style="border-left:2px solid ${edgeColor(e.type || e.rel_type)}">${truncate(String(e.from || e.source), 14)} → <em>${e.type || e.rel_type || '?'}</em></span>`
+        ).join('') : '<span style="font-family:var(--font-data);font-size:10px;color:var(--text-muted)">nenhuma</span>'}
+      </div>
+    </div>
+    <div class="detail-col">
+      <div class="detail-label">Observações</div>
+      <div class="detail-value" style="font-size:10px;line-height:1.7">
+        ${obs.length ? obs.slice(0,4).map(o => `• ${truncate(o,40)}`).join('<br>') : '—'}
+      </div>
+    </div>
+  `;
+}
+
+function clearDetails() {
+  detailsEmpty.classList.remove('hidden');
+  detailsContent.classList.add('hidden');
+  detailsContent.innerHTML = '';
+}
+
+// ─── Sidebar ───────────────────────────────────
+function renderSidebar(data) {
+  sidebarBuckets.innerHTML = '';
+
+  // Group nodes by sessionBucket
+  const bucketMap = {};
+  (data.nodes || []).forEach(n => {
+    const bucket = n.sessionBucket || 'sem sessão';
+    if (!bucketMap[bucket]) bucketMap[bucket] = [];
+    bucketMap[bucket].push(n);
+  });
+
+  // Also use sessionBuckets from data if available
+  const bucketKeys = data.sessionBuckets
+    ? data.sessionBuckets.map(b => b.bucketId)
+    : Object.keys(bucketMap).sort();
+
+  const latestBucket = bucketKeys[bucketKeys.length - 1];
+
+  bucketKeys.forEach(bKey => {
+    const nodes_ = bucketMap[bKey] || [];
+    const isCurrent = bKey === latestBucket;
+    const div = document.createElement('div');
+    div.className = 'bucket-group';
+    div.innerHTML = `
+      <div class="bucket-header${isCurrent ? ' current' : ''}">
+        <span class="bucket-label${isCurrent ? ' current' : ''}">${isCurrent ? '● ' : ''}${bKey}</span>
+        <span class="bucket-count">${nodes_.length}</span>
+      </div>
+      <div class="bucket-nodes" style="${isCurrent ? '' : 'display:none'}">
+        ${nodes_.slice(0, 12).map(n => {
+          const isLast = String(n.id) === latestNodeId;
+          const color = NODE_COLOR[n.type] || NODE_COLOR.default;
+          return `<div class="sidebar-node${isLast ? ' current-node' : ''}" data-id="${n.id}" title="${n.label || ''}">
+            <span class="node-dot" style="background:${color}"></span>
+            <span class="sidebar-node-label">${truncate(n.label, 26)}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    `;
+
+    // Toggle bucket expand
+    div.querySelector('.bucket-header').addEventListener('click', () => {
+      const body = div.querySelector('.bucket-nodes');
+      const isHidden = body.style.display === 'none';
+      body.style.display = isHidden ? '' : 'none';
+    });
+
+    // Node click from sidebar
+    div.querySelectorAll('.sidebar-node').forEach(el => {
+      el.addEventListener('click', e => {
+        e.stopPropagation();
+        const id = el.dataset.id;
+        if (!treeRoot) return;
+        const found = treeRoot.descendants().find(d =>
+          d.data.realNodes?.some(n => String(n.id) === id)
+        );
+        if (found) selectNode(found);
+      });
+    });
+
+    sidebarBuckets.appendChild(div);
+  });
+
+  // Legend
+  legend.innerHTML = `
+    <div class="legend-title">Tipos de aresta</div>
+    ${Object.entries(EDGE_COLOR).map(([type, color]) =>
+      `<div class="legend-item">
+        <div class="legend-line" style="background:${color}"></div>
+        <span>${type}</span>
+      </div>`
+    ).join('')}
+  `;
+}
+
+// ─── Fetch & Render ────────────────────────────
+async function fetchAndRender(isFirst = false) {
+  try {
+    const res = await fetch(API_URL);
+    if (!res.ok) throw new Error(`HTTP ${res.status} — servidor respondeu com erro`);
+
+    const data = await res.json();
+    if (data.error) throw new Error(data.message || data.error);
+
+    graphData = data;
+
+    renderGraph(data);
+    renderSidebar(data);
+
+    setLive(true, `${(data.nodes || []).length} nós · ${(data.edges || []).length} arestas`);
+
+    if (isFirst) {
+      overlay.classList.add('hidden');
+      resetZoom();
+    }
+  } catch (err) {
+    setLive(false, err.message);
+    if (isFirst) {
+      overlayMsg.innerHTML = `<span class="overlay-error">${err.message}</span><br><br>Verifique se o servidor Memora está rodando em <code>127.0.0.1:8765</code>`;
+      overlay.querySelector('.spinner').style.display = 'none';
+      overlay.querySelector('.overlay-title').textContent = 'Erro de conexão';
+    }
+  }
+}
+
+function setLive(online, sub) {
+  liveDoc.classList.toggle('offline', !online);
+  liveBadge.classList.toggle('offline', !online);
+  liveBadge.textContent = online ? '● LIVE' : '● OFFLINE';
+  headerSub.textContent = sub || '';
+}
+
+// ─── Init ──────────────────────────────────────
+function init() {
+  initZoom();
+
+  document.getElementById('btn-toggle-root').addEventListener('click', toggleRootEdges);
+  document.getElementById('btn-reset-zoom').addEventListener('click', resetZoom);
+  document.getElementById('btn-highlight-path').addEventListener('click', highlightActivePath);
+
+  // Initial fetch
+  fetchAndRender(true);
+  pollTimer = setInterval(() => fetchAndRender(false), POLL_INTERVAL);
+
+  // Handle resize
+  window.addEventListener('resize', () => {
+    if (graphData) renderGraph(graphData);
+  });
+}
+
+init();
+</script>
+</body>
+</html>

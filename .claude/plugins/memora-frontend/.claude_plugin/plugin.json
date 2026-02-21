@@ -1,0 +1,24 @@
+{
+  "name": "memora-frontend",
+  "version": "1.0.0",
+  "description": "Plugin de design frontend para o sistema Memora MCP com Postgres/SQLite. Inclui o comando /action que orquestra a skill memora-frontend (domínio/arquitetura) com a skill frontend-design oficial da Anthropic (qualidade estética), instalando automaticamente o que estiver faltando.",
+  "author": "Brito (linkedin: /in/brito1)",
+  "commands": ["action"],
+  "skills": ["memora-frontend"],
+  "dependencies": {
+    "skills": [
+      {
+        "name": "frontend-design",
+        "source": "anthropic/skills",
+        "path": "skills/frontend-design",
+        "install_url": "https://raw.githubusercontent.com/anthropics/skills/main/skills/frontend-design/SKILL.md",
+        "local_path": ".claude/skills/frontend-design/SKILL.md"
+      },
+      {
+        "name": "memora-frontend",
+        "source": "local",
+        "local_path": ".claude/skills/memora-frontend/SKILL.md"
+      }
+    ]
+  }
+}

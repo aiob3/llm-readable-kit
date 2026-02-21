@@ -114,6 +114,19 @@ def start_graph_server(host: str, port: int) -> None:
 
     GRAPH_HTML = _load_spa_html(version=_get_memora_version())
     VIEWS_PATH = Path.cwd() / ".agentic" / "views.json"
+    # Prefer the override dir (project root relative, same as VIEWS_PATH pattern).
+    # Falls back to package dir when copied there by start-memora-graph.bat sync.
+    _CAUSAL_OBSERVER_PATH = Path.cwd() / ".opencode" / "memora-overrides" / "graph" / "causal-observer.html"
+    if not _CAUSAL_OBSERVER_PATH.exists():
+        _CAUSAL_OBSERVER_PATH = Path(__file__).parent / "causal-observer.html"
+
+    async def causal_observer_handler(request: Request):
+        """Serve the Causal Observer SPA (new design standard)."""
+        try:
+            html = _CAUSAL_OBSERVER_PATH.read_text("utf-8")
+        except FileNotFoundError:
+            html = "<h1>causal-observer.html not found — re-run start-memora-graph.bat</h1>"
+        return HTMLResponse(html)
 
     async def graph_handler(request: Request):
         """Serve the static graph SPA."""
@@ -460,6 +473,7 @@ def start_graph_server(host: str, port: int) -> None:
     app = Starlette(
         routes=[
             Route("/graph", graph_handler),
+            Route("/causal-observer", causal_observer_handler),
             Route("/api/graph", api_graph),
             Route("/api/views", api_views, methods=["GET", "POST"]),
             Route("/api/events", graph_events),
