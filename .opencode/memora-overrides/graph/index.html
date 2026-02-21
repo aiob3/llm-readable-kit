@@ -1,0 +1,3157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Memora</title>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAgCAMAAADKfsO6AAACdlBMVEUSFSISFSERFSMSFiIRFSIRFiETFSISFiEUGCUUGCQTFyMQFCETFyQTFSMRFSEHCRQIChYQEyASFiMRFCELDhkVGCYKDBgMDxoQEx8UFyRMVWhCSlwZHCkPEh4TFiMOEBx0gpqwxeOMnrgyOUsOERyAj6nS6/+/1/RwgqEWGicRFCBVX3PR6v+90/GNp813jrIUFyU6QlPI4P+70e9ug6Zhe6Q4QVYLDRgRFiIQEh+dsMvQ6f9mcYdOYH+En8gwOU51gpjV7/+Glq5ATml/msNGU2wLDhouNEO/1vXB2PcmKjdATWh/m8RMW3efsczS7P9PWGo6RV2Qq9VSYn0LDBcGCRRPWGvP5/+ludUNDxs6Rl11j7dtgKK5zuzC2vooLTtCTmaYs91YZ4MKCxcTGCQGBxJmcojU7v+MnbcEBQ83QVhrha2EnL/G3v6twuAREx5NWnObt+FWZH8KCxYVGCUHBxN1g5p8i6MBAgs0PVNfd6KRp8nL4/+Ro74CAgxXZoCfu+RRXncHCBN2hJvV7v93hZ0EBA8iKDh4jrTC2/jU7f9bZnwAAAhfbomkwOlMWXEJChUUGSUFBhJqdoza9P9+jqYIChU4Pk5vfJRgbIIWGSZgb4qqxe5MWG8LDBg4P1C90/Ogs84EBhFPWnG51f5RXXQICRQNEBwcIS42PE1+j61mdI4PEh8KDRgQEh4iJzYSFSMOER0WGCUPEx8UFiM7QlNqdYtdZ3tmcIVgan9jboJcZntYYnc5Q1k3QFkpMUUOERssMUBCSVtRWm0/Rlg3PU1FTF9LVGgnLT8uNk0lKz4PEh0SFCISFCEOEh4MDhoNER0TFiK8bZaBAAAB6ElEQVQoz2NggAJGBiZGGAtEMMLYQBaEZIbyIQQLK5QJkmNkAdEsYC4LMwMjGwOSUSxIbCjFzgIXgJmArAPIZ2dAEWfm4GRmhBnFyMLGxc3DxcLLxy8gKARWwcbAwsggLCIqJs4jISklLSMrBzWPmVleQVFJWUVcVU1dQ1OLGWIBB7+2jq6evoGhkbGJqZk5D4MFWKmllbWNrZ29g6OTs4srUBQEeNzcPTy9vH18/fwDAoOCQ3ggBoSGhUdERkXHxMbFJyQmJaeARUVT09IzMrOyc3Lz8gsKi4o5wK4tKS1zLK+orKquqa2rb2gsNgCbW9LU3NLa1t7R2dXd09vXP4ETLDpx0uQpU6dJTJ8xcxb/7Dlzp3GA3Ss5b/6ChbJybov4JactXrJ0GQczOELklq9YWSLMM5GDWZhh1eomDkgksHCtWcvHwMDKyCi0Zt16rQ2wcBXiAsUawwY+ZuaNzKxgc2GBzgI2TggqApFjBoYHM9AedngcMTBoMTDwaTHzsfIhRxXfpjWb+WbJMghv0YIlCAZJka3btu/YuWv3nr379h+Qg6amLRsPbj10+MjRY8dPnDx1Wo4BnKLOnGU+J3/ebfkFt8jT6yQYIIKgCBWSAwEeLiG5i2ch+kEpgBkowwZSw8wGFgMApilop78uh+wAAAAASUVORK5CYII=">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" rel="stylesheet">
+    <style>
+/* Base CSS */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0d1117; color: #c9d1d9; display: flex; height: 100vh; }
+#graph { flex: 1; height: 100%; }
+div.vis-tooltip {
+    background: linear-gradient(135deg, #1f2937 0%, #161b22 100%);
+    color: #e6edf3;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4), 0 2px 8px rgba(0,0,0,0.3);
+    max-width: 320px;
+    white-space: pre-wrap;
+}
+#panel { width: 560px; background: #161b22; border-left: 1px solid #30363d; padding: 20px; overflow-y: auto; display: none; position: relative; }
+#panel.active { display: block; }
+#panel h2 { color: #58a6ff; margin-bottom: 10px; font-size: 16px; }
+#panel .tags { margin-bottom: 15px; }
+#panel .tag { display: inline-block; background: #30363d; padding: 3px 8px; border-radius: 12px; font-size: 12px; margin: 2px; cursor: pointer; overflow-wrap: anywhere; word-break: break-word; }
+#panel .tag:hover { background: #484f58; }
+#panel .meta { color: #8b949e; font-size: 12px; margin-bottom: 15px; }
+#panel .content { font-size: 13px; line-height: 1.6; background: #0d1117; padding: 15px; border-radius: 6px; max-height: calc(100vh - 200px); overflow-y: auto; overflow-wrap: anywhere; word-break: break-word; }
+#panel .content h1, #panel .content h2, #panel .content h3 { color: #58a6ff; margin: 16px 0 8px 0; }
+#panel .content h1 { font-size: 1.4em; border-bottom: 1px solid #30363d; padding-bottom: 8px; }
+#panel .content h2 { font-size: 1.2em; }
+#panel .content h3 { font-size: 1.1em; }
+#panel .content p { margin: 8px 0; }
+#panel .content ul, #panel .content ol { margin: 8px 0 8px 20px; }
+#panel .content li { margin: 4px 0; }
+#panel .content code { background: #30363d; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 12px; }
+#panel .content pre { background: #0d1117; border: 1px solid #30363d; padding: 12px; border-radius: 6px; overflow-x: auto; margin: 8px 0; }
+#panel .content pre code { background: none; padding: 0; }
+#panel .content a { color: #58a6ff; }
+#panel .content table { border-collapse: collapse; margin: 8px 0; width: 100%; }
+#panel .content th, #panel .content td { border: 1px solid #30363d; padding: 6px 10px; text-align: left; }
+#panel .content th { background: #21262d; }
+#panel .content blockquote { border-left: 3px solid #30363d; padding-left: 12px; margin: 8px 0; color: #8b949e; }
+#panel .content .mermaid { background: #161b22; padding: 16px; border-radius: 6px; overflow-x: auto; margin: 8px 0; }
+#panel .content .memory-images { margin-top: 16px; border-top: 1px solid #30363d; padding-top: 16px; }
+#panel .content .memory-image { margin: 8px 0; }
+#panel .content .memory-image img { max-width: 100%; border-radius: 6px; border: 1px solid #30363d; }
+#panel .content .memory-image .caption { font-size: 11px; color: #8b949e; margin-top: 4px; text-align: center; }
+#panel .content strong { color: #f0f6fc; }
+#panel .content .canonical-summary { background: #11161d; border: 1px solid #2f3a46; border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+#panel .content .canonical-summary h3 { margin: 0 0 8px 0; color: #58a6ff; font-size: 14px; }
+#panel .content .canonical-summary table { margin: 0; }
+#panel .content .canonical-summary th { width: 180px; color: #8b949e; font-weight: 500; }
+#panel .content .canonical-summary td code { font-size: 11px; }
+#panel .content details summary { cursor: pointer; color: #8b949e; }
+#panel .content .raw-technical { margin-top: 10px; }
+#panel .close { position: absolute; top: 10px; right: 15px; cursor: pointer; font-size: 20px; color: #8b949e; }
+#panel .close:hover { color: #fff; }
+#resize-handle { width: 6px; background: #30363d; cursor: ew-resize; display: none; }
+#resize-handle:hover, #resize-handle.dragging { background: #58a6ff; }
+#resize-handle.active { display: block; }
+
+/* Panel tabs */
+#panel-tabs { display: flex; gap: 4px; background: #0d1117; padding: 6px; border-radius: 8px; margin-bottom: 16px; }
+#panel-tabs .tab { padding: 8px 20px; cursor: pointer; color: #8b949e; border-radius: 6px; font-size: 13px; font-weight: 500; transition: all 0.15s ease; }
+#panel-tabs .tab.active { color: #fff; background: linear-gradient(135deg, #238636 0%, #2ea043 100%); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+#panel-tabs .tab:not(.active):hover { color: #c9d1d9; background: #21262d; }
+#tab-detail, #tab-timeline, #tab-history, #tab-canvas { display: none; }
+#tab-detail.active, #tab-timeline.active, #tab-history.active, #tab-canvas.active { display: block; }
+#timeline-list { max-height: calc(100vh - 120px); overflow-y: auto; }
+#timeline-list .memory-item { padding: 10px; border-bottom: 1px solid #30363d; cursor: pointer; display: flex; flex-direction: column; }
+#timeline-list .memory-item:hover { background: #21262d; }
+#timeline-list .memory-item.selected { background: #30363d; }
+#timeline-list .memory-header { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+#timeline-list .memory-title { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#timeline-list .memory-title .id { color: #58a6ff; font-weight: 500; font-size: 12px; }
+#timeline-list .memory-title .headline { color: #c9d1d9; font-size: 12px; margin-left: 6px; }
+#timeline-list .memory-actions { display: flex; gap: 6px; flex-shrink: 0; }
+#timeline-list .memory-date { background: #21262d; border: 1px solid #30363d; color: #8b949e; padding: 2px 8px; border-radius: 4px; font-size: 10px; }
+#timeline-list .details-btn { background: #21262d; border: 1px solid #30363d; color: #8b949e; padding: 2px 8px; border-radius: 4px; font-size: 10px; cursor: pointer; }
+#timeline-list .details-btn:hover { background: #30363d; color: #c9d1d9; }
+#timeline-list .memory-preview { color: #8b949e; font-size: 11px; line-height: 1.4; margin-top: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+#timeline-list .favorite-star { cursor: pointer; font-size: 14px; color: #6e7681; margin-right: 4px; }
+#timeline-list .favorite-star.active { color: #e3b341; }
+#timeline-list .favorite-star:hover { color: #e3b341; }
+#timeline-filter { display: flex; gap: 4px; padding: 8px 10px; border-bottom: 1px solid #30363d; }
+#timeline-filter .filter-btn { background: none; border: 1px solid #30363d; color: #8b949e; padding: 3px 10px; border-radius: 12px; font-size: 11px; cursor: pointer; }
+#timeline-filter .filter-btn:hover { background: #21262d; color: #c9d1d9; }
+#timeline-filter .filter-btn.active { background: #30363d; color: #e3b341; border-color: #e3b341; }
+#history-list { max-height: calc(100vh - 120px); overflow-y: auto; }
+#history-list .action-item { padding: 8px 10px; border-bottom: 1px solid #30363d; display: flex; align-items: flex-start; gap: 8px; font-size: 12px; }
+#history-list .action-icon { flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+#history-list .action-icon.create { background: #238636; color: #fff; }
+#history-list .action-icon.update { background: #1f6feb; color: #fff; }
+#history-list .action-icon.delete { background: #da3633; color: #fff; }
+#history-list .action-icon.boost { background: #d29922; color: #fff; }
+#history-list .action-icon.link { background: #8957e5; color: #fff; }
+#history-list .action-icon.unlink { background: #6e7681; color: #fff; }
+#history-list .action-icon.merge { background: #f78166; color: #fff; }
+#history-list .action-body { flex: 1; min-width: 0; }
+#history-list .action-summary { color: #c9d1d9; }
+#history-list .action-summary .mem-link { color: #58a6ff; cursor: pointer; }
+#history-list .action-summary .mem-link:hover { text-decoration: underline; }
+#history-list .action-summary .mem-link.deleted { color: #6e7681; cursor: default; text-decoration: line-through; pointer-events: none; }
+#history-list .action-count { color: #8b949e; font-size: 11px; margin-left: 4px; }
+#history-list .action-time { color: #8b949e; font-size: 10px; margin-top: 2px; }
+
+/* Timeline slider */
+#timeline-container {
+    position: absolute;
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 280px;
+    background: rgba(22,27,34,0.95);
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: 1px solid #30363d;
+    z-index: 100;
+}
+#timeline-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3px;
+    font-size: 10px;
+    color: #8b949e;
+}
+#timeline-label .title { color: #58a6ff; font-weight: 500; }
+#timeline-label .date-range { color: #c9d1d9; }
+#timeline-slider {
+    width: 100%;
+    height: 3px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: linear-gradient(to right, #238636 0%, #58a6ff 100%, #30363d 100%);
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+}
+#timeline-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    background: #58a6ff;
+    border-radius: 50%;
+    cursor: grab;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    transition: transform 0.1s ease;
+}
+#timeline-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.15);
+    background: #79b8ff;
+}
+#timeline-slider::-webkit-slider-thumb:active {
+    cursor: grabbing;
+    transform: scale(1.1);
+}
+#timeline-slider::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    background: #58a6ff;
+    border-radius: 50%;
+    cursor: grab;
+    border: none;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+#timeline-dates {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    font-size: 9px;
+    color: #6e7681;
+}
+#sidebar-toggle { display: none !important; }
+#sidebar-wrapper { display: none !important; }
+#legend {
+    background: rgba(22,27,34,0.95);
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    border-left: 3px solid #8b949e;
+    margin-bottom: 8px;
+}
+#legend > b { color: #c9d1d9; }
+.legend-item { margin: 4px 0; display: flex; align-items: center; cursor: pointer; padding: 2px 4px; border-radius: 4px; }
+.legend-item:hover { background: rgba(255,255,255,0.1); }
+.legend-item.active { background: rgba(88,166,255,0.3); }
+.legend-item.selected { color: #ffffff; }
+.legend-item.legend-empty { color: #8b949e; cursor: default; font-style: italic; }
+.legend-item.legend-empty:hover { background: transparent; }
+.legend-color { width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
+#legend .reset { margin-top: 8px; padding-top: 8px; border-top: 1px solid #30363d; color: #58a6ff; cursor: pointer; }
+#legend-items { max-height: 300px; overflow-y: auto; transition: max-height 0.3s ease; }
+#legend-items.expanded { max-height: 300px; }
+.legend-toggle { cursor: pointer; color: #8b949e; font-size: 11px; margin-left: 4px; }
+.legend-toggle:hover { color: #c9d1d9; }
+#legend .reset:hover { text-decoration: underline; }
+#latest-memory-indicator { margin: 8px 0 10px 0; padding: 8px; border-radius: 6px; border: 1px solid #7f1d1d; background: rgba(239,68,68,0.12); color: #fecaca; font-size: 11px; line-height: 1.35; }
+#latest-memory-indicator .latest-title { color: #ef4444; font-weight: 700; display: block; margin-bottom: 2px; }
+#latest-memory-indicator .latest-meta { color: #fca5a5; }
+#latest-memory-indicator .latest-tag { color: #fee2e2; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+#tag-categories-items { margin-top: 8px; padding-top: 8px; border-top: 1px solid #30363d; }
+#tag-categories-items .legend-item.tag-category { font-size: 11px; color: #8b949e; }
+#tag-categories-items .legend-item.tag-category .legend-color { width: 8px; height: 8px; }
+.legend-item.latest-related { border-left: 2px solid #ef4444; background: rgba(239,68,68,0.14); }
+.legend-item .latest-badge { margin-left: 6px; color: #fecaca; font-size: 10px; font-weight: 700; }
+.section-item.latest-related { border-left: 2px solid #ef4444; background: rgba(239,68,68,0.14); color: #f5d0fe; }
+#duplicates-legend {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #30363d;
+}
+#duplicates-legend .legend-color {
+    font-size: 10px;
+}
+#sections {
+    background: rgba(22,27,34,0.95);
+    padding: 12px;
+    border-radius: 0 6px 6px 0;
+    font-size: 12px;
+    max-height: 40vh;
+    overflow-y: auto;
+    white-space: nowrap;
+    border-left: 3px solid #a855f7;
+    border-top: 2px solid #a855f7;
+}
+#sections b { display: block; margin-bottom: 8px; color: #a855f7; }
+.section-item { margin: 4px 0; cursor: pointer; padding: 3px 6px; border-radius: 4px; color: #a855f7; }
+.section-item:hover { background: rgba(255,255,255,0.1); }
+.section-item.active { background: rgba(168,85,247,0.3); }
+.section-item.selected { color: #ffffff; }
+.canvas-panel { background: rgba(13,17,23,0.95); border: 1px solid #30363d; border-radius: 8px; padding: 10px; }
+.canvas-panel h3 { margin: 0 0 6px 0; color: #58a6ff; font-size: 14px; }
+.chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.chip { padding: 4px 8px; border-radius: 999px; border: 1px solid #30363d; cursor: pointer; font-size: 11px; color: #c9d1d9; }
+.chip.active { background: #238636; border-color: #2ea043; color: #fff; }
+.chip.toggle { background: #30363d; }
+.chip.toggle.active { background: #d97706; border-color: #f59e0b; }
+.panel-block { margin-bottom: 10px; }
+.panel-block label { font-size: 11px; color: #8b949e; display: block; margin-bottom: 4px; }
+#selection-box { position: absolute; border: 1px dashed #58a6ff; background: rgba(88,166,255,0.1); pointer-events: none; display: none; z-index: 70; }
+#selection-list { font-size: 11px; color: #c9d1d9; max-height: 120px; overflow-y: auto; }
+.saved-view { display: flex; align-items: center; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #30363d; font-size: 11px; }
+.saved-view button { background: none; border: 1px solid #30363d; color: #c9d1d9; padding: 2px 6px; border-radius: 4px; cursor: pointer; }
+.saved-view button:hover { background: #21262d; }
+.active-query { background: #11161d; border: 1px solid #2f3a46; border-radius: 8px; padding: 8px; margin-bottom: 10px; }
+.active-query .title { font-size: 11px; color: #8b949e; margin-bottom: 6px; }
+.active-query .chip { margin-bottom: 4px; }
+.causal-tree { max-height: 260px; overflow-y: auto; border: 1px solid #30363d; border-radius: 8px; padding: 8px; background: #0d1117; }
+.causal-node { font-size: 12px; color: #c9d1d9; padding: 3px 6px; border-radius: 5px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.causal-node:hover { background: rgba(255,255,255,0.07); }
+.causal-node.active { background: rgba(88,166,255,0.22); border: 1px solid rgba(88,166,255,0.45); }
+.causal-node .code { color: #8b949e; min-width: 52px; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+.causal-node .name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.causal-node .count { color: #8b949e; font-size: 11px; }
+.causal-children { margin-left: 14px; border-left: 1px dashed #30363d; padding-left: 6px; }
+.facet-group { margin-bottom: 10px; }
+.facet-group .chip-row { max-height: 84px; overflow-y: auto; }
+.subsection-item { margin: 2px 0 2px 8px; cursor: pointer; padding: 2px 6px; border-radius: 4px; color: #8b949e; font-size: 11px; }
+.subsection-item:hover { background: rgba(255,255,255,0.1); }
+.subsection-item.active { background: rgba(88,166,255,0.3); color: #c9d1d9; }
+.subsection-item.selected { color: #ffffff; }
+#help { position: absolute; bottom: 10px; left: 10px; background: rgba(22,27,34,0.9); padding: 8px 12px; border-radius: 6px; font-size: 11px; color: #8b949e; }
+#node-tooltip { position: absolute; display: none; background: rgba(22,27,34,0.95); border: 1px solid #30363d; padding: 8px 12px; border-radius: 6px; pointer-events: none; z-index: 1000; max-width: 300px; }
+#node-tooltip .tooltip-id { color: #58a6ff; font-size: 12px; font-weight: bold; }
+#node-tooltip .tooltip-desc { color: #8b949e; font-size: 10px; margin-top: 4px; }
+
+/* SPA-specific CSS */
+#loading { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #58a6ff; font-size: 16px; }
+#search-box { position: absolute; top: 10px; left: 220px; background: rgba(22,27,34,0.9); padding: 8px; border-radius: 6px; }
+#search-box input { background: #0d1117; border: 1px solid #30363d; color: #c9d1d9; padding: 6px 10px; border-radius: 4px; width: 200px; }
+#search-box input:focus { outline: none; border-color: #58a6ff; }
+
+/* Toolbar with database selector, version, and connection status */
+#toolbar { position: absolute; top: 10px; left: 440px; background: rgba(22,27,34,0.9); padding: 8px 12px; border-radius: 6px; display: flex; align-items: center; gap: 12px; z-index: 50; }
+#db-selector { display: flex; align-items: center; gap: 8px; }
+#db-selector label { color: #8b949e; font-size: 12px; }
+#db-selector select { background: #0d1117; border: 1px solid #30363d; color: #c9d1d9; padding: 6px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+#db-selector select:focus { outline: none; border-color: #58a6ff; }
+#db-selector select option { background: #0d1117; }
+#version { color: #6e7681; font-size: 11px; }
+#version #version-db { color: #58a6ff; }
+
+/* Issue badge CSS */
+.issue-badges { margin-bottom: 12px; }
+.issue-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-right: 4px;
+    color: #fff;
+}
+.issue-badge.component { background: #30363d; color: #c9d1d9; }
+.issue-badge.commit { background: #21262d; color: #8b949e; font-family: monospace; }
+#issues-legend {
+    margin-top: 16px;
+    padding: 12px;
+    border-top: 2px solid #58a6ff;
+    border-left: 3px solid #58a6ff;
+    background: rgba(88, 166, 255, 0.05);
+    border-radius: 0 6px 6px 0;
+}
+#issues-legend b { display: block; margin-bottom: 8px; color: #8b949e; cursor: pointer; font-size: 11px; }
+#issues-legend b:hover { text-decoration: underline; }
+#issues-legend b.active { background: rgba(88,166,255,0.2); padding: 2px 6px; border-radius: 4px; margin: -2px -6px 6px -6px; }
+.legend-item.issue-category .legend-color {
+    width: 8px !important;
+    height: 8px !important;
+}
+.issue-categories { margin-top: 8px; padding-top: 8px; border-top: 1px solid #30363d; }
+.issue-categories b { font-size: 11px; color: #8b949e; margin-bottom: 4px; display: inline !important; }
+.issue-categories .legend-toggle { margin-left: 4px; }
+.issue-categories.collapsed .section-items { display: none; }
+.legend-item.issue-status { font-size: 11px; color: #8b949e; }
+.legend-item.issue-status.selected { color: #ffffff; }
+.legend-item.issue-category { font-size: 11px; padding-left: 8px; }
+
+/* TODO badge CSS */
+.todo-badges { margin-bottom: 12px; }
+.todo-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-right: 4px;
+    color: #fff;
+}
+.todo-badge.category { background: #30363d; color: #c9d1d9; }
+.todo-badge.priority-high { background: #f85149; }
+.todo-badge.priority-medium { background: #d29922; }
+.todo-badge.priority-low { background: #8b949e; }
+#todos-legend {
+    margin-top: 16px;
+    padding: 12px;
+    border-top: 2px solid #58a6ff;
+    border-left: 3px solid #58a6ff;
+    background: rgba(88, 166, 255, 0.05);
+    border-radius: 0 6px 6px 0;
+}
+#todos-legend b { display: block; margin-bottom: 8px; color: #8b949e; cursor: pointer; font-size: 11px; }
+#todos-legend b:hover { text-decoration: underline; }
+#todos-legend b.active { background: rgba(88,166,255,0.2); padding: 2px 6px; border-radius: 4px; margin: -2px -6px 6px -6px; }
+.legend-item.todo-category .legend-color {
+    width: 8px !important;
+    height: 8px !important;
+}
+.todo-categories { margin-top: 8px; padding-top: 8px; border-top: 1px solid #30363d; }
+.todo-categories b { font-size: 11px; color: #8b949e; margin-bottom: 4px; display: inline !important; }
+.todo-categories .legend-toggle { margin-left: 4px; }
+.todo-categories.collapsed .section-items { display: none; }
+.legend-item.todo-status { font-size: 11px; color: #8b949e; }
+.legend-item.todo-status.selected { color: #ffffff; }
+.legend-item.todo-category { font-size: 11px; padding-left: 8px; }
+
+/* Connection status indicator */
+.connection-status {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #8b949e;
+    transition: background 0.3s ease;
+}
+.connection-status.connected { background: #7ee787; box-shadow: 0 0 8px #7ee787; }
+.connection-status.disconnected { background: #d29922; animation: pulse 1s infinite; }
+.connection-status.error { background: #f85149; }
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Update notification */
+#update-notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    background: linear-gradient(135deg, #238636 0%, #2ea043 100%);
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 1000;
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+#update-notification.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+/* Chat panel */
+#chat-toggle { position: fixed; bottom: 20px; left: 20px; width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #238636 0%, #2ea043 100%); border: none; color: #fff; font-size: 22px; cursor: pointer; z-index: 200; box-shadow: 0 4px 12px rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+#chat-toggle:hover { transform: scale(1.1); box-shadow: 0 6px 16px rgba(0,0,0,0.5); }
+#chat-toggle.hidden { display: none; }
+#chat-panel { position: fixed; bottom: 0; left: 20px; width: 520px; height: 480px; background: #161b22; border: 1px solid #238636; border-bottom: none; border-radius: 12px 12px 0 0; z-index: 200; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.3s ease; box-shadow: 0 -4px 20px rgba(35,134,54,0.3); }
+#chat-panel.open { transform: translateY(0); }
+#chat-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid #30363d; flex-shrink: 0; cursor: pointer; }
+#chat-header:hover { background: #1c2128; }
+#chat-header .title { font-size: 14px; font-weight: 600; color: #c9d1d9; }
+#chat-header .collapse-btn { background: none; border: none; color: #8b949e; font-size: 18px; cursor: pointer; padding: 0 4px; }
+#chat-header .collapse-btn:hover { color: #fff; }
+#chat-messages { flex: 1; overflow-y: auto; padding: 12px 16px; }
+#chat-input-area { border-top: 1px solid #30363d; padding: 10px 16px; display: flex; gap: 8px; flex-shrink: 0; }
+#chat-input { flex: 1; background: #0d1117; border: 1px solid #30363d; color: #c9d1d9; padding: 10px 12px; border-radius: 6px; font-size: 13px; font-family: inherit; resize: none; min-height: 38px; max-height: 120px; line-height: 1.4; }
+#chat-input:focus { outline: none; border-color: #58a6ff; }
+#chat-send { background: linear-gradient(135deg, #238636 0%, #2ea043 100%); border: none; color: #fff; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 500; white-space: nowrap; align-self: flex-end; }
+#chat-send:hover { background: linear-gradient(135deg, #2ea043 0%, #3fb950 100%); }
+#chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.chat-msg { margin: 10px 0; padding: 12px 14px; border-radius: 8px; font-size: 13px; line-height: 1.7; }
+.chat-msg.user { background: #1f6feb22; border: 1px solid #1f6feb44; margin-left: 40px; }
+.chat-msg.assistant { background: #0d1117; border: 1px solid #30363d; max-width: 100%; }
+.chat-msg.assistant .content { word-wrap: break-word; }
+.chat-msg.assistant .content h1 { color: #58a6ff; font-size: 1.2em; margin: 16px 0 8px 0; padding-bottom: 6px; border-bottom: 1px solid #30363d; }
+.chat-msg.assistant .content h2 { color: #58a6ff; font-size: 1.1em; margin: 14px 0 6px 0; }
+.chat-msg.assistant .content h3 { color: #79b8ff; font-size: 1em; margin: 12px 0 4px 0; }
+.chat-msg.assistant .content p { margin: 8px 0; }
+.chat-msg.assistant .content p:first-child { margin-top: 0; }
+.chat-msg.assistant .content p:last-child { margin-bottom: 0; }
+.chat-msg.assistant .content code { background: #30363d; padding: 2px 6px; border-radius: 4px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; }
+.chat-msg.assistant .content pre { background: #0d1117; border: 1px solid #30363d; padding: 12px; border-radius: 6px; overflow-x: auto; margin: 10px 0; }
+.chat-msg.assistant .content pre code { background: none; padding: 0; }
+.chat-msg.assistant .content a { color: #58a6ff; text-decoration: none; }
+.chat-msg.assistant .content a:hover { text-decoration: underline; }
+.chat-msg.assistant .content a.chat-mem-link { color: #58a6ff; background: #1f6feb22; padding: 1px 5px; border-radius: 4px; font-weight: 500; white-space: nowrap; }
+.chat-msg.assistant .content a.chat-mem-link:hover { background: #1f6feb44; text-decoration: none; }
+.chat-msg.assistant .content ul, .chat-msg.assistant .content ol { margin: 8px 0 8px 20px; padding-left: 4px; }
+.chat-msg.assistant .content li { margin: 4px 0; }
+.chat-msg.assistant .content li > ul, .chat-msg.assistant .content li > ol { margin: 2px 0 2px 16px; }
+.chat-msg.assistant .content strong { color: #f0f6fc; }
+.chat-msg.assistant .content em { color: #b1bac4; }
+.chat-msg.assistant .content blockquote { border-left: 3px solid #30363d; padding-left: 12px; margin: 8px 0; color: #8b949e; }
+.chat-msg.assistant .content table { border-collapse: collapse; margin: 8px 0; width: 100%; font-size: 12px; }
+.chat-msg.assistant .content th, .chat-msg.assistant .content td { border: 1px solid #30363d; padding: 6px 10px; text-align: left; }
+.chat-msg.assistant .content th { background: #21262d; color: #f0f6fc; }
+.chat-msg.assistant .content hr { border: none; border-top: 1px solid #30363d; margin: 12px 0; }
+.chat-msg.error { background: #f8514922; border: 1px solid #f8514944; color: #f85149; }
+.chat-msg.welcome { background: none; border: none; color: #8b949e; text-align: center; padding: 20px; max-width: 100%; }
+
+.chat-refs { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; padding-top: 8px; border-top: 1px solid #30363d; }
+.chat-ref { background: #21262d; border: 1px solid #30363d; color: #58a6ff; padding: 2px 8px; border-radius: 4px; font-size: 11px; cursor: pointer; }
+.chat-ref:hover { background: #30363d; color: #79b8ff; }
+
+.chat-typing { padding: 10px 12px; color: #8b949e; font-size: 12px; }
+.chat-typing .dots span { animation: chatBlink 1.4s infinite both; }
+.chat-typing .dots span:nth-child(2) { animation-delay: 0.2s; }
+.chat-typing .dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes chatBlink { 0%, 80%, 100% { opacity: 0; } 40% { opacity: 1; } }
+    </style>
+</head>
+<body>
+    <div id="graph"><div id="loading">Loading memories...</div></div>
+    <div id="resize-handle"></div>
+    <div id="panel">
+        <span class="close" onclick="closePanel()">&times;</span>
+        <div id="panel-tabs">
+            <span class="tab active" onclick="switchTab('detail')">Details</span>
+            <span class="tab" onclick="switchTab('timeline')">Timeline</span>
+            <span class="tab" onclick="switchTab('history')">History</span>
+            <span class="tab" onclick="switchTab('canvas')">Explorer</span>
+        </div>
+        <div id="tab-detail" class="active">
+            <h2 id="panel-title">Memory #</h2>
+            <div class="meta" id="panel-meta"></div>
+            <div class="chip-row">
+                <span class="chip" onclick="omitCurrentMemory()">Omit This Node</span>
+                <span class="chip" onclick="restoreOmitted()">Restore Omitted</span>
+            </div>
+            <div class="tags" id="panel-tags"></div>
+            <div class="content" id="panel-content"></div>
+        </div>
+        <div id="tab-timeline">
+            <div id="timeline-filter"><button class="filter-btn" onclick="filterTimeline('favorites')">&#9733; Favorites</button><button class="filter-btn active" onclick="filterTimeline('all')">Show All</button></div>
+            <div id="timeline-list"></div>
+        </div>
+        <div id="tab-history">
+            <div id="history-list"></div>
+        </div>
+        <div id="tab-canvas">
+            <div class="canvas-panel" id="canvas-panel">
+                <h3>Explorer Causal (Session-first)</h3>
+                <div class="active-query">
+                    <div class="title">Consulta ativa</div>
+                    <div class="chip-row" id="active-query-chips"></div>
+                </div>
+                <div class="facet-group">
+                    <label>Sections (causal tree)</label>
+                    <div class="causal-tree" id="causal-tree"></div>
+                </div>
+                <div class="facet-group">
+                    <label>Sessoes canonicas (bucket 4h)</label>
+                    <div class="chip-row" id="session-chips"></div>
+                </div>
+                <div class="facet-group">
+                    <label>Clusters</label>
+                    <div class="chip-row" id="cluster-chips"></div>
+                </div>
+                <div class="facet-group">
+                    <label>Sections (raw)</label>
+                    <div class="chip-row" id="section-facet-chips"></div>
+                </div>
+                <div class="facet-group">
+                    <label>Tags</label>
+                    <div class="chip-row" id="tag-facet-chips"></div>
+                </div>
+                <div class="panel-block">
+                    <label>Tempo</label>
+                    <div class="chip-row">
+                        <span class="chip" id="time-2h" onclick="setTimePreset('2h')">2h</span>
+                        <span class="chip" id="time-4h" onclick="setTimePreset('4h')">4h</span>
+                        <span class="chip" id="time-12h" onclick="setTimePreset('12h')">12h</span>
+                        <span class="chip" id="time-24h" onclick="setTimePreset('24h')">24h</span>
+                        <span class="chip" id="time-all" onclick="setTimePreset(null)">All</span>
+                    </div>
+                </div>
+                <div class="panel-block">
+                    <label>Grau minimo</label>
+                    <input type="range" id="degree-slider" min="0" max="10" value="0" oninput="setDegree(this.value)">
+                    <span id="degree-value" style="font-size:11px;color:#8b949e;">0</span>
+                </div>
+                <div class="panel-block">
+                    <div class="chip-row">
+                        <span class="chip toggle active" id="dup-toggle" onclick="toggleDuplicates()">Duplicates: ON</span>
+                        <span class="chip toggle" id="hide-toggle" onclick="toggleHidden()">Hidden: OFF</span>
+                        <span class="chip toggle" id="code-toggle" onclick="toggleShowCodes()">Codes: OFF</span>
+                    </div>
+                </div>
+                <div class="panel-block">
+                    <label>Selection</label>
+                    <div id="selection-list">Use Shift+arrastar para selecionar.</div>
+                    <div class="chip-row">
+                        <span class="chip" onclick="applySpotlight()">Spotlight</span>
+                        <span class="chip" onclick="clearSpotlight()">Clear</span>
+                        <span class="chip" onclick="omitSelected()">Omit Selected</span>
+                    </div>
+                    <div class="chip-row">
+                        <span class="chip" onclick="saveViewPrompt()">Save View</span>
+                        <span class="chip" onclick="resetFilters()">Reset</span>
+                        <span class="chip" onclick="restoreOmitted()">Restore Omitted</span>
+                    </div>
+                </div>
+                <div class="panel-block">
+                    <label>Saved Views</label>
+                    <div id="views-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button id="sidebar-toggle" onclick="toggleSidebar()" title="Toggle tags & sections">&#9776;</button>
+    <div id="sidebar-wrapper">
+        <div id="legend"><b>Tags</b><div id="latest-memory-indicator"></div><div id="legend-items" class="expanded"></div><div id="tag-categories-items"></div><div id="issues-legend-items"></div><div id="todos-legend-items"></div><div id="duplicates-legend-items"></div><div class="reset" onclick="resetFilter()">Show All</div></div>
+        <div id="sections"><b>Sections</b><div id="section-items"></div></div>
+    </div>
+    <div id="selection-box"></div>
+    <div id="timeline-container" style="display:none;">
+        <div id="timeline-label">
+            <span class="title">Timeline</span>
+            <span id="timeline-current" class="date-range">Drag to filter by time</span>
+            <span class="reset" onclick="resetTimeline()" style="cursor:pointer;color:#58a6ff;">Reset</span>
+        </div>
+        <input type="range" id="timeline-slider" min="0" max="100" value="100" oninput="onTimelineChange(this.value)">
+        <div id="timeline-dates">
+            <span id="timeline-min-date">Oldest</span>
+            <span id="timeline-max-date">Newest</span>
+        </div>
+    </div>
+    <div id="search-box"><input type="text" id="search" placeholder="Search memories..." oninput="searchMemories(this.value)"></div>
+    <div id="toolbar">
+        <div id="connection-status" class="connection-status" title="Connecting..."></div>
+        <div id="db-selector">
+            <label for="db-select">Database:</label>
+            <select id="db-select" onchange="switchDatabase(this.value)">
+                <option value="memora">memora</option>
+                <option value="ob1">ob1</option>
+            </select>
+        </div>
+        <div id="version"><span id="version-db">memora</span> | Cloudflare</div>
+    </div>
+    <div id="help">Use Explorer para filtrar | Click node to view | Scroll to zoom | Type to search (or #id) | Drag timeline</div>
+    <div id="node-tooltip"></div>
+    <button id="chat-toggle" onclick="toggleChat()" title="Chat about memories">&#x1F4AC;</button>
+    <div id="chat-panel">
+        <div id="chat-header" onclick="toggleChat()">
+            <span class="title">Chat</span>
+            <button class="collapse-btn" title="Collapse">&#x25BC;</button>
+        </div>
+        <div id="chat-messages"></div>
+        <div id="chat-input-area">
+            <textarea id="chat-input" placeholder="Ask about your memories..." rows="1" onkeydown="chatKeyDown(event)" oninput="autoResizeChatInput(this)"></textarea>
+            <button id="chat-send" onclick="sendChatMessage()">Send</button>
+        </div>
+    </div>
+    <script>
+        var MEMORA_CONFIG = window.MEMORA_CONFIG || {
+            version: '',
+            r2Prefix: '/api/r2/',
+            dbSelector: true,
+            wsUrl: 'wss://memora-graph-sync.cloudflare-strategic612.workers.dev/ws',
+            sseUrl: null
+        };
+
+        var graphData = null;
+        var nodes, edges, network;
+        var currentFilter = null;
+        var memoryCache = {};
+        var currentDb = 'memora';
+
+        // Initialize database from URL parameter
+        function initDbFromUrl() {
+            var params = new URLSearchParams(window.location.search);
+            var dbParam = params.get('db');
+            if (dbParam && (dbParam === 'memora' || dbParam === 'ob1')) {
+                currentDb = dbParam;
+                document.getElementById('db-select').value = currentDb;
+            }
+            document.getElementById('version-db').textContent = currentDb;
+        }
+
+        // Get database query parameter for API calls
+        function getDbParam() {
+            if (!MEMORA_CONFIG.dbSelector) return '';
+            return currentDb ? '?db=' + currentDb : '';
+        }
+
+        // Switch database and reload everything
+        function switchDatabase(dbName) {
+            if (dbName === currentDb) return;
+            currentDb = dbName;
+
+            // Update URL without reload
+            var url = new URL(window.location);
+            url.searchParams.set('db', dbName);
+            window.history.pushState({}, '', url);
+
+            // Update version label
+            document.getElementById('version-db').textContent = dbName;
+
+            // Clear caches
+            memoryCache = {};
+
+            // Reload graph
+            document.getElementById('loading')?.remove();
+            var loadingDiv = document.createElement('div');
+            loadingDiv.id = 'loading';
+            loadingDiv.textContent = 'Loading ' + dbName + ' memories...';
+            document.getElementById('graph').appendChild(loadingDiv);
+
+            // Close panel if open
+            closePanel();
+
+            // Reset filter
+            currentFilter = null;
+
+            loadGraph();
+        }
+
+        // Configure marked for GitHub-flavored markdown
+        marked.setOptions({ breaks: true, gfm: true });
+
+        // Initialize mermaid with dark theme
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'dark',
+            themeVariables: {
+                primaryColor: '#58a6ff',
+                primaryTextColor: '#c9d1d9',
+                primaryBorderColor: '#30363d',
+                lineColor: '#8b949e',
+                secondaryColor: '#21262d',
+                tertiaryColor: '#161b22'
+            }
+        });
+
+        // Set up marked.js with custom renderer for mermaid
+        marked.use({
+            renderer: {
+                code: function(code, infostring, escaped) {
+                    var language = (infostring || '').trim().split(' ')[0];
+                    if (language === 'mermaid') {
+                        return '<div class="mermaid-pending">' + code + '</div>';
+                    }
+                    var esc = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                    var langClass = language ? ' class="language-' + language + '"' : '';
+                    return '<pre><code' + langClass + '>' + esc + '</code></pre>';
+                }
+            }
+        });
+
+        function renderMarkdown(text) {
+            return marked.parse(text);
+        }
+
+        async function renderMermaidBlocks() {
+            var blocks = document.querySelectorAll('#panel-content .mermaid-pending');
+            if (blocks.length === 0) return;
+
+            for (var block of blocks) {
+                block.className = 'mermaid';
+                block.removeAttribute('data-processed');
+            }
+
+            await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+            try {
+                var mermaidNodes = document.querySelectorAll('#panel-content .mermaid:not([data-processed])');
+                await mermaid.run({ nodes: Array.from(mermaidNodes) });
+            } catch (e) {
+                console.error('Mermaid render error:', e);
+            }
+        }
+
+        function renderImages(metadata) {
+            var images = metadata && metadata.images;
+            if (!images || images.length === 0) return '';
+            var html = '<div class="memory-images">';
+            for (var img of images) {
+                // Update R2 URLs to use our proxy with database parameter
+                var src = img.src;
+                if (src && src.startsWith('r2://')) {
+                    src = MEMORA_CONFIG.r2Prefix + src.replace('r2://', '') + getDbParam();
+                } else if (src && src.startsWith(MEMORA_CONFIG.r2Prefix) && !src.includes('?db=')) {
+                    src = src + getDbParam();
+                }
+                html += '<div class="memory-image"><img src="' + src + '" alt="' + (img.caption || '') + '">';
+                if (img.caption) html += '<div class="caption">' + img.caption + '</div>';
+                html += '</div>';
+            }
+            return html + '</div>';
+        }
+
+        function renderIssueBadges(metadata) {
+            if (!metadata || metadata.type !== 'issue') return '';
+            var status = metadata.status || 'open';
+            var closedReason = metadata.closed_reason || '';
+            var severity = metadata.severity || 'unknown';
+            var component = metadata.component || '';
+            var commit = metadata.commit || '';
+
+            var statusKey = status;
+            var statusDisplay = status.toUpperCase();
+            if (status === 'closed' && closedReason) {
+                statusKey = 'closed:' + closedReason;
+                statusDisplay = 'CLOSED (' + closedReason.toUpperCase().replace('_', ' ') + ')';
+            }
+
+            var statusColors = {open: '#ff7b72', 'closed:complete': '#7ee787', 'closed:not_planned': '#8b949e'};
+            var severityColors = {critical: '#f85149', major: '#d29922', minor: '#8b949e'};
+
+            var html = '<div class="issue-badges">';
+            html += '<span class="issue-badge" style="background:' + (statusColors[statusKey] || '#8b949e') + '">' + statusDisplay + '</span>';
+            html += '<span class="issue-badge" style="background:' + (severityColors[severity] || '#8b949e') + '">' + severity + '</span>';
+            if (component) html += '<span class="issue-badge component">' + component + '</span>';
+            if (commit) html += '<span class="issue-badge commit">#' + commit.slice(0,7) + '</span>';
+            html += '</div>';
+            return html;
+        }
+
+        function renderTodoBadges(metadata) {
+            if (!metadata || metadata.type !== 'todo') return '';
+            var status = metadata.status || 'open';
+            var closedReason = metadata.closed_reason || '';
+            var priority = metadata.priority || 'medium';
+            var category = metadata.category || '';
+
+            var statusKey = status;
+            var statusDisplay = status.toUpperCase();
+            if (status === 'closed' && closedReason) {
+                statusKey = 'closed:' + closedReason;
+                statusDisplay = 'CLOSED (' + closedReason.toUpperCase().replace('_', ' ') + ')';
+            }
+
+            var statusColors = {open: '#58a6ff', 'closed:complete': '#7ee787', 'closed:not_planned': '#8b949e'};
+            var priorityColors = {high: '#f85149', medium: '#d29922', low: '#8b949e'};
+
+            var html = '<div class="todo-badges">';
+            html += '<span class="todo-badge" style="background:' + (statusColors[statusKey] || '#8b949e') + '">' + statusDisplay + '</span>';
+            html += '<span class="todo-badge" style="background:' + (priorityColors[priority] || '#8b949e') + '">' + priority + '</span>';
+            if (category) html += '<span class="todo-badge category">' + category + '</span>';
+            html += '</div>';
+            return html;
+        }
+
+        // Filtering functions
+        function toggleSection(el) {
+            var parent = el.parentElement;
+            parent.classList.toggle('collapsed');
+            el.textContent = parent.classList.contains('collapsed') ? '[+]' : '[-]';
+        }
+
+        function filterByDuplicates() {
+            document.querySelectorAll('.legend-item, .section-item, .subsection-item').forEach(el => el.classList.remove('active'));
+            var el = document.querySelector('#duplicates-legend .legend-item');
+            if (el) el.classList.add('active');
+            currentFilter = 'duplicates';
+            var nodeIds = graphData.duplicateIds || [];
+            applyFilter(nodeIds, currentFilter);
+        }
+
+        function escapeHtml(text) {
+            return String(text || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/\"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function applyLatestHighlightToNodes() {
+            if (!graphData || !Array.isArray(graphData.nodes)) return;
+            var latest = graphData.latestMemory || null;
+            if (!latest || !latest.id) return;
+            graphData.nodes = graphData.nodes.map(function(n) {
+                if (n.id !== latest.id) return n;
+                return Object.assign({}, n, {
+                    size: Math.max(n.size || 12, 22),
+                    borderWidth: Math.max(n.borderWidth || 2, 5),
+                    color: {
+                        background: '#ef4444',
+                        border: '#ffffff',
+                        highlight: { background: '#dc2626', border: '#ffffff' },
+                        hover: { background: '#dc2626', border: '#ffffff' }
+                    },
+                    title: (n.title || '') + '\\n[LATEST]'
+                });
+            });
+        }
+
+        function renderLatestIndicator() {
+            var el = document.getElementById('latest-memory-indicator');
+            if (!el) return;
+            var latest = graphData ? graphData.latestMemory : null;
+            if (!latest || !latest.id) {
+                el.innerHTML = '';
+                el.style.display = 'none';
+                return;
+            }
+            el.style.display = 'block';
+            var ts = latest.effective || latest.updated || latest.created || '';
+            var headline = latest.headline ? escapeHtml(latest.headline) : '';
+            var section = latest.section ? escapeHtml(latest.section) : 'n/a';
+            var primaryTag = escapeHtml(latest.primaryTag || 'untagged');
+            var summary = headline ? ('<div class=\"latest-meta\">' + headline + '</div>') : '';
+            el.innerHTML =
+                '<span class=\"latest-title\">LATEST RECORD #' + latest.id + '</span>' +
+                '<div class=\"latest-meta\">' + escapeHtml(ts) + ' · section: ' + section + '</div>' +
+                '<div class=\"latest-tag\">tag: ' + primaryTag + '</div>' +
+                summary;
+        }
+
+        function getSortedTagEntries(limit) {
+            var entries = Object.entries(graphData.tagColors || {}).map(function(pair) {
+                var tag = pair[0];
+                var color = pair[1];
+                var count = ((graphData.tagToNodes || {})[tag] || []).length;
+                return [tag, color, count];
+            });
+            entries.sort(function(a, b) {
+                if (b[2] !== a[2]) return b[2] - a[2];
+                return a[0].localeCompare(b[0]);
+            });
+            return entries.slice(0, limit || 64);
+        }
+
+        function filterByTag(tag) {
+            setTagFacet(tag);
+        }
+
+        function tagCategory(tag) {
+            if (!tag) return 'other';
+            if (tag.indexOf(':') >= 0) return tag.split(':', 1)[0];
+            if (tag.indexOf('/') >= 0) return tag.split('/', 1)[0];
+            return 'other';
+        }
+
+        function filterByTagCategory(category) {
+            var ids = new Set();
+            for (var tagName of Object.keys(graphData.tagToNodes || {})) {
+                if (tagCategory(tagName) === category) ids.add(tagName);
+            }
+            filterState.filtersV2.tags = Array.from(ids);
+            buildTagFacetChips();
+            renderActiveQuery();
+            applyCanvasFilters(false);
+        }
+
+        function filterBySection(section) {
+            setSectionFacet(section);
+        }
+
+        function filterBySubsection(subsection) {
+            setSectionFacet(subsection);
+        }
+
+        function applyFilter(nodeIds, filterKey) {
+            filterState.legendNodeIds = Array.from(new Set((nodeIds || []).map(function(id) { return parseInt(id, 10); })));
+            filterState.legendFilterKey = filterKey || null;
+            renderActiveQuery();
+            applyCanvasFilters(false);
+        }
+
+        // Explorer v2 filters (multiselect livre, OR intra-dimensao + AND entre dimensoes)
+        function defaultFilterState() {
+            return {
+                mode: 'organogram-flat',
+                showCodes: false,
+                filtersV2: {
+                    sessions: [],
+                    causalNodes: [],
+                    clusters: [],
+                    tags: [],
+                    sections: [],
+                    timePreset: null,
+                    degreeMin: 0,
+                    showDuplicates: true,
+                    showHidden: false,
+                },
+                legendNodeIds: [],
+                legendFilterKey: null,
+            };
+        }
+        var filterState = defaultFilterState();
+        var spotlightNodes = new Set();
+        var selectedNodes = [];
+        var omittedNodes = new Set();
+        var selectionBox = document.getElementById('selection-box');
+        var isSelecting = false;
+        var selectStart = null;
+
+        function toggleInArray(arr, value) {
+            var next = Array.isArray(arr) ? arr.slice() : [];
+            var idx = next.indexOf(value);
+            if (idx >= 0) {
+                next.splice(idx, 1);
+            } else {
+                next.push(value);
+            }
+            return next;
+        }
+
+        function renderActiveQuery() {
+            var el = document.getElementById('active-query-chips');
+            if (!el) return;
+            var f = filterState.filtersV2 || {};
+            var chips = [];
+
+            function pushChips(kind, values) {
+                (values || []).forEach(function(value) {
+                    chips.push({ kind: kind, value: String(value) });
+                });
+            }
+
+            pushChips('session', f.sessions);
+            pushChips('causal', f.causalNodes);
+            pushChips('cluster', f.clusters);
+            pushChips('tag', f.tags);
+            pushChips('section', f.sections);
+            if (f.timePreset) chips.push({ kind: 'time', value: f.timePreset });
+            if ((f.degreeMin || 0) > 0) chips.push({ kind: 'degree', value: '>=' + String(f.degreeMin) });
+            if (!f.showDuplicates) chips.push({ kind: 'duplicates', value: 'hidden' });
+            if (f.showHidden) chips.push({ kind: 'hidden', value: 'shown' });
+            if ((filterState.legendNodeIds || []).length > 0) chips.push({ kind: 'manual', value: String((filterState.legendNodeIds || []).length) + ' nodes' });
+            if (spotlightNodes.size > 0) chips.push({ kind: 'spotlight', value: String(spotlightNodes.size) + ' nodes' });
+
+            if (!chips.length) {
+                el.innerHTML = '<span style="font-size:11px;color:#8b949e;">(sem filtros ativos)</span>';
+                return;
+            }
+
+            el.innerHTML = chips.map(function(chip) {
+                var safeKind = String(chip.kind).replace(/'/g, "\\'");
+                var safeValue = String(chip.value).replace(/'/g, "\\'");
+                return '<span class="chip active" onclick="removeFilterChip(\'' + safeKind + '\', \'' + safeValue + '\')">' +
+                    chip.kind + ': ' + chip.value + ' ×</span>';
+            }).join('');
+        }
+
+        function removeFilterChip(kind, value) {
+            var f = filterState.filtersV2 || {};
+            if (kind === 'session') f.sessions = (f.sessions || []).filter(function(x) { return String(x) !== String(value); });
+            if (kind === 'causal') f.causalNodes = (f.causalNodes || []).filter(function(x) { return String(x) !== String(value); });
+            if (kind === 'cluster') f.clusters = (f.clusters || []).filter(function(x) { return String(x) !== String(value); });
+            if (kind === 'tag') f.tags = (f.tags || []).filter(function(x) { return String(x) !== String(value); });
+            if (kind === 'section') f.sections = (f.sections || []).filter(function(x) { return String(x) !== String(value); });
+            if (kind === 'time') f.timePreset = null;
+            if (kind === 'degree') f.degreeMin = 0;
+            if (kind === 'duplicates') f.showDuplicates = true;
+            if (kind === 'hidden') f.showHidden = false;
+            if (kind === 'manual') {
+                filterState.legendNodeIds = [];
+                filterState.legendFilterKey = null;
+            }
+            if (kind === 'spotlight') spotlightNodes = new Set();
+            filterState.filtersV2 = f;
+            updateFilterControls();
+            buildExplorer();
+            applyCanvasFilters(false);
+        }
+
+        function updateFilterControls() {
+            var f = filterState.filtersV2 || {};
+
+            var dupToggle = document.getElementById('dup-toggle');
+            if (dupToggle) {
+                dupToggle.classList.toggle('active', f.showDuplicates !== false);
+                dupToggle.textContent = (f.showDuplicates !== false) ? 'Duplicates: ON' : 'Duplicates: OFF';
+            }
+            var hideToggle = document.getElementById('hide-toggle');
+            if (hideToggle) {
+                hideToggle.classList.toggle('active', f.showHidden === true);
+                hideToggle.textContent = (f.showHidden === true) ? 'Hidden: ON' : 'Hidden: OFF';
+            }
+            var codeToggle = document.getElementById('code-toggle');
+            if (codeToggle) {
+                codeToggle.classList.toggle('active', filterState.showCodes === true);
+                codeToggle.textContent = filterState.showCodes ? 'Codes: ON' : 'Codes: OFF';
+            }
+
+            var degreeSlider = document.getElementById('degree-slider');
+            var degreeValue = document.getElementById('degree-value');
+            if (degreeSlider) degreeSlider.value = String(f.degreeMin || 0);
+            if (degreeValue) degreeValue.textContent = String(f.degreeMin || 0);
+
+            var presets = ['2h', '4h', '12h', '24h', null];
+            presets.forEach(function(preset) {
+                var id = preset ? ('time-' + preset) : 'time-all';
+                var el = document.getElementById(id);
+                if (el) el.classList.toggle('active', f.timePreset === preset);
+            });
+            renderActiveQuery();
+        }
+
+        function setLogic(mode) {
+            // Compat no-op: v2 fixed semantics (OR intra + AND inter).
+            updateFilterControls();
+        }
+
+        function setTimePreset(preset) {
+            filterState.filtersV2.timePreset = preset;
+            updateFilterControls();
+            applyCanvasFilters();
+        }
+
+        function setDegree(val) {
+            filterState.filtersV2.degreeMin = parseInt(val || 0, 10) || 0;
+            updateFilterControls();
+            applyCanvasFilters();
+        }
+
+        function toggleDuplicates() {
+            filterState.filtersV2.showDuplicates = !(filterState.filtersV2.showDuplicates !== false);
+            updateFilterControls();
+            applyCanvasFilters();
+        }
+
+        function toggleHidden() {
+            filterState.filtersV2.showHidden = !Boolean(filterState.filtersV2.showHidden);
+            updateFilterControls();
+            applyCanvasFilters();
+        }
+
+        function toggleShowCodes() {
+            filterState.showCodes = !Boolean(filterState.showCodes);
+            updateFilterControls();
+            buildCausalTree();
+            applyCanvasFilters();
+        }
+
+        function setCluster(cid) {
+            filterState.filtersV2.clusters = toggleInArray(filterState.filtersV2.clusters, cid);
+            buildClusterChips();
+            renderActiveQuery();
+            applyCanvasFilters();
+        }
+
+        function setSession(sid) {
+            filterState.filtersV2.sessions = toggleInArray(filterState.filtersV2.sessions, sid);
+            buildSessionChips();
+            renderActiveQuery();
+            applyCanvasFilters();
+        }
+
+        function setCausalCode(code) {
+            filterState.filtersV2.causalNodes = toggleInArray(filterState.filtersV2.causalNodes, code);
+            buildCausalTree();
+            renderActiveQuery();
+            applyCanvasFilters();
+        }
+
+        function setTagFacet(tag) {
+            filterState.filtersV2.tags = toggleInArray(filterState.filtersV2.tags, tag);
+            buildTagFacetChips();
+            renderActiveQuery();
+            applyCanvasFilters();
+        }
+
+        function setSectionFacet(section) {
+            filterState.filtersV2.sections = toggleInArray(filterState.filtersV2.sections, section);
+            buildSectionFacetChips();
+            renderActiveQuery();
+            applyCanvasFilters();
+        }
+
+        function resetFilters() {
+            filterState = defaultFilterState();
+            selectedNodes = [];
+            spotlightNodes = new Set();
+            omittedNodes = new Set();
+            document.querySelectorAll('.legend-item, .section-item, .subsection-item').forEach(el => el.classList.remove('active'));
+            currentFilter = null;
+            updateSelectionList();
+            updateFilterControls();
+            buildClusterChips();
+            buildSessionChips();
+            buildCausalTree();
+            buildTagFacetChips();
+            buildSectionFacetChips();
+            applyCanvasFilters(true);
+        }
+
+        function nodePassesFilters(n) {
+            if (omittedNodes.has(n.id)) return false;
+
+            var criteria = [];
+            var f = filterState.filtersV2 || {};
+            var duplicateSet = new Set(graphData.duplicateIds || []);
+            var nodeVisibility = String(n.visibility || 'active');
+            var legendNodeIds = Array.isArray(filterState.legendNodeIds) ? filterState.legendNodeIds : [];
+            var nodeId = n.id;
+            var nodeKey = String(nodeId);
+            var nodeCluster = graphData.nodePrimaryCluster ? String(graphData.nodePrimaryCluster[nodeKey] || graphData.nodePrimaryCluster[nodeId] || '') : '';
+            if (!nodeCluster && graphData.nodeToCluster) {
+                nodeCluster = String(graphData.nodeToCluster[nodeKey] || graphData.nodeToCluster[nodeId] || '');
+            }
+            var nodeBucket = (graphData.nodeSessionBucket && (graphData.nodeSessionBucket[nodeKey] || graphData.nodeSessionBucket[nodeId])) || n.sessionBucket || '';
+            var nodeSection = (graphData.nodeSection && (graphData.nodeSection[nodeKey] || graphData.nodeSection[nodeId])) || n.section || '';
+            var nodePath = (graphData.nodeCausalPath && (graphData.nodeCausalPath[nodeKey] || graphData.nodeCausalPath[nodeId])) || n.causalPath || [];
+            var nodeLeaf = (graphData.nodeCausalLeaf && (graphData.nodeCausalLeaf[nodeKey] || graphData.nodeCausalLeaf[nodeId])) || n.causalCode || '';
+
+            if (f.showDuplicates === false) {
+                criteria.push(!duplicateSet.has(n.id));
+            }
+            if (!f.showHidden) {
+                criteria.push(nodeVisibility !== 'hidden');
+            }
+            if ((f.degreeMin || 0) > 0) {
+                criteria.push((n.degree || 0) >= f.degreeMin);
+            }
+            if (Array.isArray(f.clusters) && f.clusters.length > 0) {
+                criteria.push(f.clusters.indexOf(nodeCluster) >= 0);
+            }
+            if (Array.isArray(f.sessions) && f.sessions.length > 0) {
+                criteria.push(f.sessions.indexOf(String(nodeBucket)) >= 0);
+            }
+            if (Array.isArray(f.sections) && f.sections.length > 0) {
+                criteria.push(f.sections.some(function(section) {
+                    var normalized = String(section || '');
+                    return String(nodeSection || '').startsWith(normalized);
+                }));
+            }
+            if (Array.isArray(f.tags) && f.tags.length > 0) {
+                var nodeTagSet = graphData.nodeTags ? (graphData.nodeTags[nodeKey] || graphData.nodeTags[nodeId] || []) : [];
+                criteria.push(f.tags.some(function(tag) { return nodeTagSet.indexOf(tag) >= 0; }));
+            }
+            if (Array.isArray(f.causalNodes) && f.causalNodes.length > 0) {
+                criteria.push(f.causalNodes.some(function(code) {
+                    if (nodeLeaf === code) return true;
+                    return (nodePath || []).some(function(pathCode) {
+                        return pathCode === code || String(pathCode).startsWith(String(code) + '.');
+                    });
+                }));
+            }
+            if (legendNodeIds.length > 0) {
+                criteria.push(legendNodeIds.indexOf(n.id) >= 0);
+            }
+            if (f.timePreset) {
+                var tsRaw = graphData.nodeTimestamps ? graphData.nodeTimestamps[n.id] : null;
+                if (!tsRaw) {
+                    criteria.push(false);
+                } else {
+                    var ts = new Date(tsRaw.replace(' ', 'T') + 'Z');
+                    var now = new Date();
+                    var diffH = (now - ts) / 3600000;
+                    var limit = f.timePreset === '2h' ? 2
+                        : f.timePreset === '4h' ? 4
+                        : f.timePreset === '12h' ? 12 : 24;
+                    criteria.push(diffH <= limit);
+                }
+            }
+
+            if (criteria.length === 0) return true;
+            return criteria.every(Boolean);
+        }
+
+        function applyCanvasFilters(reset, skipFit) {
+            if (!graphData || !nodes || !edges) return;
+            if (reset) {
+                spotlightNodes = new Set();
+            }
+
+            var keptIds = graphData.nodes.filter(nodePassesFilters).map(function(n) { return n.id; });
+            var keptSet = new Set(keptIds);
+
+            if (spotlightNodes.size > 0) {
+                keptIds = keptIds.filter(function(id) { return spotlightNodes.has(id); });
+                keptSet = new Set(keptIds);
+            }
+
+            var filteredNodes = graphData.nodes.filter(function(n) { return keptSet.has(n.id); });
+            var filteredEdges = graphData.edges.filter(function(e) { return keptSet.has(e.from) && keptSet.has(e.to); });
+
+            nodes.clear();
+            edges.clear();
+            nodes.add(filteredNodes);
+            edges.add(filteredEdges);
+
+            selectedNodes = selectedNodes.filter(function(id) { return keptSet.has(id); });
+            updateSelectionList();
+
+            if (!skipFit && reset) {
+                network.fit({ animation: false });
+            }
+        }
+
+        function updateSelectionList() {
+            var el = document.getElementById('selection-list');
+            if (!el) return;
+            if (!selectedNodes.length) {
+                el.textContent = 'Use Shift+arrastar para selecionar.';
+                return;
+            }
+            el.innerHTML = selectedNodes.map(id => '#' + id).join(', ');
+        }
+
+        function applySpotlight() {
+            if (!selectedNodes.length) return;
+            var keep = new Set(selectedNodes);
+            // add 1-hop neighbors
+            graphData.edges.forEach(e => {
+                if (keep.has(e.from)) keep.add(e.to);
+                if (keep.has(e.to)) keep.add(e.from);
+            });
+            spotlightNodes = keep;
+            applyCanvasFilters(false);
+        }
+
+        function clearSpotlight() {
+            spotlightNodes = new Set();
+            applyCanvasFilters(false);
+        }
+
+        function omitSelected() {
+            if (!selectedNodes.length) return;
+            selectedNodes.forEach(function(id) { omittedNodes.add(id); });
+            selectedNodes = [];
+            updateSelectionList();
+            applyCanvasFilters(false);
+        }
+
+        function restoreOmitted() {
+            omittedNodes = new Set();
+            applyCanvasFilters(false);
+        }
+
+        function omitCurrentMemory() {
+            if (!currentPanelMemoryId) return;
+            omittedNodes.add(parseInt(currentPanelMemoryId, 10));
+            applyCanvasFilters(false);
+            closePanel();
+        }
+
+        function handleLassoStart(evt) {
+            if (!evt.shiftKey) return;
+            isSelecting = true;
+            selectStart = { x: evt.clientX, y: evt.clientY };
+            selectionBox.style.display = 'block';
+            selectionBox.style.left = selectStart.x + 'px';
+            selectionBox.style.top = selectStart.y + 'px';
+            selectionBox.style.width = '0px';
+            selectionBox.style.height = '0px';
+        }
+
+        function handleLassoMove(evt) {
+            if (!isSelecting || !selectStart) return;
+            var x1 = Math.min(selectStart.x, evt.clientX);
+            var y1 = Math.min(selectStart.y, evt.clientY);
+            var x2 = Math.max(selectStart.x, evt.clientX);
+            var y2 = Math.max(selectStart.y, evt.clientY);
+            selectionBox.style.left = x1 + 'px';
+            selectionBox.style.top = y1 + 'px';
+            selectionBox.style.width = (x2 - x1) + 'px';
+            selectionBox.style.height = (y2 - y1) + 'px';
+        }
+
+        function handleLassoEnd(evt) {
+            if (!isSelecting) return;
+            isSelecting = false;
+            selectionBox.style.display = 'none';
+            var rect = {
+                x1: parseInt(selectionBox.style.left),
+                y1: parseInt(selectionBox.style.top),
+                x2: parseInt(selectionBox.style.left) + parseInt(selectionBox.style.width),
+                y2: parseInt(selectionBox.style.top) + parseInt(selectionBox.style.height),
+            };
+            var boxSelect = [];
+            var positions = network.getPositions();
+            var graphRect = document.getElementById('graph').getBoundingClientRect();
+            Object.entries(positions).forEach(([id, pos]) => {
+                var domPos = network.canvasToDOM(pos);
+                var absX = graphRect.left + domPos.x;
+                var absY = graphRect.top + domPos.y;
+                if (absX >= rect.x1 && absX <= rect.x2 && absY >= rect.y1 && absY <= rect.y2) {
+                    boxSelect.push(parseInt(id, 10));
+                }
+            });
+            if (boxSelect.length) {
+                selectedNodes = Array.from(new Set(boxSelect));
+                updateSelectionList();
+            }
+        }
+
+        function buildClusterChips() {
+            var el = document.getElementById('cluster-chips');
+            if (!el) return;
+            el.innerHTML = '';
+            var clusters = graphData && graphData.facetCounts && graphData.facetCounts.clusters
+                ? Object.keys(graphData.facetCounts.clusters).sort()
+                : [];
+            clusters.slice(0, 24).forEach(cid => {
+                var span = document.createElement('span');
+                var active = (filterState.filtersV2.clusters || []).indexOf(cid) >= 0;
+                span.className = 'chip' + (active ? ' active' : '');
+                var count = graphData.facetCounts && graphData.facetCounts.clusters
+                    ? graphData.facetCounts.clusters[cid]
+                    : 0;
+                span.textContent = String(cid) + ' (' + String(count || 0) + ')';
+                span.onclick = function() { setCluster(cid); };
+                el.appendChild(span);
+            });
+        }
+
+        function buildSessionChips() {
+            var el = document.getElementById('session-chips');
+            if (!el) return;
+            el.innerHTML = '';
+            var buckets = Array.isArray(graphData && graphData.sessionBuckets) ? graphData.sessionBuckets : [];
+            buckets.slice(0, 24).forEach(bucket => {
+                var span = document.createElement('span');
+                var sid = String(bucket.bucketId || '');
+                var active = (filterState.filtersV2.sessions || []).indexOf(sid) >= 0;
+                span.className = 'chip' + (active ? ' active' : '');
+                span.textContent = String(bucket.shortLabel || sid) + ' (' + String(bucket.memoryCount || 0) + ')';
+                span.title = (bucket.sessionIds || []).join(', ');
+                span.onclick = function() { setSession(sid); };
+                el.appendChild(span);
+            });
+        }
+
+        function buildTagFacetChips() {
+            var el = document.getElementById('tag-facet-chips');
+            if (!el) return;
+            el.innerHTML = '';
+            var tags = graphData && graphData.facetCounts && graphData.facetCounts.tags
+                ? Object.entries(graphData.facetCounts.tags)
+                : [];
+            tags.sort(function(a, b) { return b[1] - a[1]; });
+            tags.slice(0, 28).forEach(function(entry) {
+                var tag = String(entry[0]);
+                var count = Number(entry[1] || 0);
+                var active = (filterState.filtersV2.tags || []).indexOf(tag) >= 0;
+                var span = document.createElement('span');
+                span.className = 'chip' + (active ? ' active' : '');
+                span.textContent = tag + ' (' + String(count) + ')';
+                span.onclick = function() { setTagFacet(tag); };
+                el.appendChild(span);
+            });
+        }
+
+        function buildSectionFacetChips() {
+            var el = document.getElementById('section-facet-chips');
+            if (!el) return;
+            el.innerHTML = '';
+            var sections = graphData && graphData.facetCounts && graphData.facetCounts.sections
+                ? Object.entries(graphData.facetCounts.sections)
+                : [];
+            sections.sort(function(a, b) { return b[1] - a[1]; });
+            sections.slice(0, 28).forEach(function(entry) {
+                var section = String(entry[0]);
+                var count = Number(entry[1] || 0);
+                var active = (filterState.filtersV2.sections || []).indexOf(section) >= 0;
+                var span = document.createElement('span');
+                span.className = 'chip' + (active ? ' active' : '');
+                span.textContent = section + ' (' + String(count) + ')';
+                span.onclick = function() { setSectionFacet(section); };
+                el.appendChild(span);
+            });
+        }
+
+        function renderCausalTreeNode(node, depth) {
+            var selected = (filterState.filtersV2.causalNodes || []).indexOf(node.code) >= 0;
+            var codeLabel = filterState.showCodes ? ('<span class="code">' + escapeHtml(String(node.code)) + '</span>') : '';
+            var html = '<div class="causal-node' + (selected ? ' active' : '') + '" data-causal-code="' + escapeHtml(String(node.code)) + '" onclick="setCausalCode(\'' + String(node.code).replace(/'/g, "\\'") + '\')">' +
+                codeLabel +
+                '<span class="name">' + escapeHtml(String(node.label || node.code)) + '</span>' +
+                '<span class="count">(' + String(node.count || 0) + ')</span>' +
+                '</div>';
+            var children = Array.isArray(node.children) ? node.children : [];
+            if (children.length) {
+                html += '<div class="causal-children">';
+                children.forEach(function(child) {
+                    html += renderCausalTreeNode(child, depth + 1);
+                });
+                html += '</div>';
+            }
+            return html;
+        }
+
+        function buildCausalTree() {
+            var el = document.getElementById('causal-tree');
+            if (!el) return;
+            var tree = Array.isArray(graphData && graphData.causalTree) ? graphData.causalTree : [];
+            if (!tree.length) {
+                el.innerHTML = '<div style="font-size:11px;color:#8b949e;">Sem arvore causal</div>';
+                return;
+            }
+            var html = '';
+            tree.forEach(function(node) {
+                html += renderCausalTreeNode(node, 0);
+            });
+            el.innerHTML = html;
+        }
+
+        function buildExplorer() {
+            buildCausalTree();
+            buildSessionChips();
+            buildClusterChips();
+            buildTagFacetChips();
+            buildSectionFacetChips();
+            renderActiveQuery();
+        }
+
+        // Saved views
+        async function loadViews() {
+            try {
+                var resp = await fetch('/api/views');
+                var data = await resp.json();
+                renderViews(data.views || []);
+            } catch (e) { console.error('loadViews', e); }
+        }
+
+        function renderViews(views) {
+            var el = document.getElementById('views-list');
+            if (!el) return;
+            el.innerHTML = '';
+            (views || []).forEach(v => {
+                var row = document.createElement('div');
+                row.className = 'saved-view';
+                row.innerHTML = '<span>' + (v.name || 'view') + '</span>';
+                var btn = document.createElement('button');
+                btn.textContent = 'Load';
+                btn.onclick = function() { applyView(v); };
+                row.appendChild(btn);
+                el.appendChild(row);
+            });
+        }
+
+        async function saveViewPrompt() {
+            var name = prompt('Save view as:');
+            if (!name) return;
+            var payload = {
+                name: name,
+                mode: filterState.mode || 'organogram-flat',
+                filtersV2: filterState.filtersV2 || {},
+                treeState: {
+                    showCodes: !!filterState.showCodes,
+                },
+                selected: selectedNodes,
+                omitted: Array.from(omittedNodes),
+                spotlight: {
+                    enabled: spotlightNodes.size > 0,
+                    hops: 1,
+                    nodeIds: Array.from(spotlightNodes),
+                },
+                filterLogicVersion: 'ssot-v2',
+                positions: {},
+            };
+            // include positions
+            try {
+                var pos = network.getPositions(nodes.getIds());
+                payload.positions = pos;
+            } catch (e) {}
+            await fetch('/api/views', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+            loadViews();
+        }
+
+        function applyView(v) {
+            var nextState = defaultFilterState();
+            if (v.filtersV2 && typeof v.filtersV2 === 'object') {
+                nextState.filtersV2 = Object.assign(nextState.filtersV2, v.filtersV2);
+            } else if (v.filters && typeof v.filters === 'object') {
+                // Legacy compatibility for ssot-v1 views.
+                nextState.filtersV2.timePreset = v.filters.timePreset || null;
+                nextState.filtersV2.degreeMin = Number(v.filters.degreeMin || 0);
+                nextState.filtersV2.showDuplicates = v.filters.showDuplicates !== false;
+                nextState.filtersV2.showHidden = !!v.filters.showHidden;
+                if (v.filters.cluster) nextState.filtersV2.clusters = [String(v.filters.cluster)];
+                if (v.filters.session) nextState.filtersV2.sessions = [String(v.filters.session)];
+            }
+            if (typeof v.mode === 'string') {
+                nextState.mode = v.mode;
+            }
+            if (v.treeState && typeof v.treeState === 'object') {
+                nextState.showCodes = !!v.treeState.showCodes;
+            }
+            filterState = nextState;
+            selectedNodes = Array.isArray(v.selected) ? v.selected.slice() : [];
+            omittedNodes = new Set(Array.isArray(v.omitted) ? v.omitted : []);
+            var spotlightIds = [];
+            if (Array.isArray(v.spotlight)) {
+                spotlightIds = v.spotlight;
+            } else if (v.spotlight && Array.isArray(v.spotlight.nodeIds)) {
+                spotlightIds = v.spotlight.nodeIds;
+            }
+            spotlightNodes = new Set(spotlightIds);
+            updateSelectionList();
+            updateFilterControls();
+            buildExplorer();
+            applyCanvasFilters(false, true);
+
+            if (v.positions) {
+                try {
+                    requestAnimationFrame(function() {
+                        Object.entries(v.positions).forEach(function(entry) {
+                            var id = parseInt(entry[0], 10);
+                            var p = entry[1];
+                            if (!p || !nodes.get(id)) return;
+                            network.moveNode(id, p.x, p.y);
+                        });
+                        network.redraw();
+                    });
+                } catch (e) { console.error(e); }
+            }
+        }
+
+        function resetFilter() {
+            exitFocusMode();
+            resetFilters();
+        }
+
+        var focusedNodeId = null;
+
+        function getConnectedNodes(nodeId, hops) {
+            var connected = new Set([nodeId]);
+            for (var h = 0; h < hops; h++) {
+                var toAdd = [];
+                graphData.edges.forEach(function(e) {
+                    if (connected.has(e.from)) toAdd.push(e.to);
+                    if (connected.has(e.to)) toAdd.push(e.from);
+                });
+                toAdd.forEach(function(id) { connected.add(id); });
+            }
+            return connected;
+        }
+
+        function focusOnNode(nodeId) {
+            if (timelineActive) {
+                resetTimeline();
+            }
+
+            focusedNodeId = nodeId;
+            var hop1 = getConnectedNodes(nodeId, 1);
+            var hop2 = getConnectedNodes(nodeId, 2);
+
+            var visibleNodeIds = new Set(nodes.getIds());
+            var visibleEdgeIds = new Set(edges.getIds());
+
+            var nodeUpdates = graphData.nodes.filter(function(n) {
+                return visibleNodeIds.has(n.id);
+            }).map(function(n) {
+                if (n.id === nodeId) {
+                    return { id: n.id, borderWidth: 4, color: { background: n.color.background || n.color, border: '#58a6ff' }, opacity: 1 };
+                } else if (hop1.has(n.id)) {
+                    return { id: n.id, borderWidth: n.borderWidth || 2, color: n.color, opacity: 1 };
+                } else if (hop2.has(n.id)) {
+                    return { id: n.id, borderWidth: n.borderWidth || 2, color: n.color, opacity: 0.35 };
+                } else {
+                    return { id: n.id, borderWidth: n.borderWidth || 2, color: n.color, opacity: 0.08 };
+                }
+            });
+
+            var edgeUpdates = graphData.edges.filter(function(e) {
+                return visibleEdgeIds.has(e.id);
+            }).map(function(e) {
+                if (e.from === nodeId || e.to === nodeId) {
+                    return { id: e.id, width: 4, color: '#4CC9F0' };
+                } else if (hop2.has(e.from) && hop2.has(e.to)) {
+                    return { id: e.id, width: 1, color: 'rgba(139,148,158,0.35)' };
+                } else {
+                    return { id: e.id, width: 1, color: 'rgba(48,54,61,0.05)' };
+                }
+            });
+
+            nodes.update(nodeUpdates);
+            edges.update(edgeUpdates);
+        }
+
+        function exitFocusMode() {
+            if (!focusedNodeId) return;
+            focusedNodeId = null;
+
+            var visibleNodeIds = new Set(nodes.getIds());
+            var visibleEdgeIds = new Set(edges.getIds());
+
+            var nodeUpdates = graphData.nodes.filter(function(n) {
+                return visibleNodeIds.has(n.id);
+            }).map(function(n) {
+                return { id: n.id, borderWidth: n.borderWidth || 2, color: n.color, opacity: 1 };
+            });
+            var edgeUpdates = graphData.edges.filter(function(e) {
+                return visibleEdgeIds.has(e.id);
+            }).map(function(e) {
+                return { id: e.id, width: 1, color: e.color || 'rgba(48,54,61,0.6)' };
+            });
+
+            nodes.update(nodeUpdates);
+            edges.update(edgeUpdates);
+        }
+
+        // Issue filter functions
+        function filterAllIssues() {
+            document.querySelectorAll('.legend-item, .section-item, .subsection-item').forEach(el => el.classList.remove('active'));
+            document.querySelector('#issues-legend b').classList.add('active');
+            currentFilter = 'all-issues';
+            var nodeIds = [];
+            Object.values(graphData.statusToNodes || {}).forEach(ids => nodeIds.push(...ids));
+            applyFilter(nodeIds, currentFilter);
+        }
+
+        function filterByStatus(status) {
+            document.querySelectorAll('.legend-item, .section-item, .subsection-item').forEach(el => el.classList.remove('active'));
+            var el = document.querySelector('.legend-item[data-status="' + status + '"]');
+            if (el) el.classList.add('active');
+            currentFilter = 'status:' + status;
+            var nodeIds = graphData.statusToNodes[status] || [];
+            applyFilter(nodeIds, currentFilter);
+        }
+
+        function filterByIssueCategory(category) {
+            document.querySelectorAll('.legend-item, .section-item, .subsection-item').forEach(el => el.classList.remove('active'));
+            var el = document.querySelector('.legend-item[data-issue-category="' + category + '"]');
+            if (el) el.classList.add('active');
+            currentFilter = 'issue-category:' + category;
+            var nodeIds = graphData.issueCategoryToNodes[category] || [];
+            applyFilter(nodeIds, currentFilter);
+        }
+
+        // TODO filter functions
+        function filterAllTodos() {
+            document.querySelectorAll('.legend-item, .section-item, .subsection-item').forEach(el => el.classList.remove('active'));
+            document.querySelector('#todos-legend b').classList.add('active');
+            currentFilter = 'all-todos';
+            var nodeIds = [];
+            Object.values(graphData.todoStatusToNodes || {}).forEach(ids => nodeIds.push(...ids));
+            applyFilter(nodeIds, currentFilter);
+        }
+
+        function filterByTodoStatus(status) {
+            document.querySelectorAll('.legend-item, .section-item, .subsection-item').forEach(el => el.classList.remove('active'));
+            var el = document.querySelector('.legend-item[data-todo-status="' + status + '"]');
+            if (el) el.classList.add('active');
+            currentFilter = 'todo-status:' + status;
+            var nodeIds = graphData.todoStatusToNodes[status] || [];
+            applyFilter(nodeIds, currentFilter);
+        }
+
+        function filterByTodoCategory(category) {
+            document.querySelectorAll('.legend-item, .section-item, .subsection-item').forEach(el => el.classList.remove('active'));
+            var el = document.querySelector('.legend-item[data-todo-category="' + category + '"]');
+            if (el) el.classList.add('active');
+            currentFilter = 'todo-category:' + category;
+            var nodeIds = graphData.todoCategoryToNodes[category] || [];
+            applyFilter(nodeIds, currentFilter);
+        }
+
+        // Tooltip functions
+        function showNodeTooltip(nodeId, pointer) {
+            var node = nodes.get(nodeId);
+            if (!node || !node.title) return;
+            var parts = node.title.split('\n');
+            var idLine = parts[0] || '';
+            var descLine = parts.slice(1).join(' ') || '';
+            var tooltip = document.getElementById('node-tooltip');
+            tooltip.innerHTML = '<div class="tooltip-id">' + idLine + '</div>' +
+                                (descLine ? '<div class="tooltip-desc">' + descLine + '</div>' : '');
+            tooltip.style.left = (pointer.DOM.x + 15) + 'px';
+            tooltip.style.top = (pointer.DOM.y + 15) + 'px';
+            tooltip.style.display = 'block';
+        }
+
+        function hideNodeTooltip() {
+            document.getElementById('node-tooltip').style.display = 'none';
+        }
+
+        // Panel functions
+        var currentPanelMemoryId = null;
+        var currentTab = 'detail';
+
+        function switchTab(tabName) {
+            currentTab = tabName;
+            document.querySelectorAll('#panel-tabs .tab').forEach(function(t) { t.classList.remove('active'); });
+            document.querySelector('#panel-tabs .tab[onclick*="' + tabName + '"]').classList.add('active');
+            document.getElementById('tab-detail').classList.toggle('active', tabName === 'detail');
+            document.getElementById('tab-timeline').classList.toggle('active', tabName === 'timeline');
+            document.getElementById('tab-history').classList.toggle('active', tabName === 'history');
+            document.getElementById('tab-canvas').classList.toggle('active', tabName === 'canvas');
+            if (tabName === 'timeline') {
+                populateTimelineList();
+            } else if (tabName === 'history') {
+                populateHistoryList();
+            } else if (tabName === 'detail' && currentPanelMemoryId) {
+                loadMemoryToPanel(currentPanelMemoryId);
+            }
+        }
+
+        function loadMemoryToPanel(memId) {
+            memId = parseInt(memId, 10);
+            if (memoryCache[memId]) {
+                showPanel(memoryCache[memId]);
+            } else {
+                fetch('/api/memories/' + memId + getDbParam())
+                    .then(function(r) { return r.json(); })
+                    .then(function(mem) {
+                        if (!mem.error) {
+                            memoryCache[memId] = mem;
+                            showPanel(mem);
+                        }
+                    });
+            }
+        }
+
+        var timelinePageSize = 50;
+        var timelineOffset = 0;
+        var timelineTotal = 0;
+        var timelineLoading = false;
+
+        function populateTimelineList() {
+            timelineOffset = 0;
+            timelineTotal = 0;
+            cachedTimelineMemories = null;
+            document.getElementById('timeline-list').innerHTML = '<div style="padding:20px;color:#8b949e;">Loading...</div>';
+            loadTimelinePage();
+        }
+
+        function loadTimelinePage() {
+            if (timelineLoading) return;
+            timelineLoading = true;
+            var dbp = getDbParam();
+            var sep = dbp ? dbp + '&' : '?';
+            fetch('/api/memories' + sep + 'limit=' + timelinePageSize + '&offset=' + timelineOffset)
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    timelineLoading = false;
+                    if (data.memories) {
+                        timelineTotal = data.total || 0;
+                        if (!cachedTimelineMemories) {
+                            cachedTimelineMemories = data.memories;
+                        } else {
+                            cachedTimelineMemories = cachedTimelineMemories.concat(data.memories);
+                        }
+                        timelineOffset = cachedTimelineMemories.length;
+                        renderTimelineList(cachedTimelineMemories);
+                    }
+                })
+                .catch(function(e) {
+                    timelineLoading = false;
+                    if (!cachedTimelineMemories) {
+                        document.getElementById('timeline-list').innerHTML = '<div style="padding:20px;color:#f85149;">Error loading memories</div>';
+                    }
+                });
+        }
+
+        var timelineFilter = 'all';
+        var cachedTimelineMemories = null;
+
+        function filterTimeline(mode) {
+            timelineFilter = mode;
+            document.querySelectorAll('#timeline-filter .filter-btn').forEach(function(btn) {
+                btn.classList.toggle('active', btn.textContent.indexOf(mode === 'favorites' ? 'Favorites' : 'Show All') !== -1);
+            });
+            if (cachedTimelineMemories) renderTimelineList(cachedTimelineMemories);
+        }
+
+        function renderTimelineList(memories) {
+            memories = memories.filter(function(mem) {
+                return !(mem.metadata && mem.metadata.type === 'section');
+            });
+            cachedTimelineMemories = memories;
+            if (timelineFilter === 'favorites') {
+                memories = memories.filter(function(mem) { return mem.metadata && mem.metadata.favorite; });
+            }
+            memories.sort(function(a, b) {
+                return new Date(b.created) - new Date(a.created);
+            });
+
+            var html = memories.map(function(mem) {
+                var headline = getMemoryHeadline(mem.content);
+                var preview = getMemoryPreview(mem.content);
+                var selectedClass = (currentPanelMemoryId === mem.id) ? ' selected' : '';
+                var isFav = mem.metadata && mem.metadata.favorite;
+                var starClass = 'favorite-star' + (isFav ? ' active' : '');
+                var starIcon = isFav ? '\u2605' : '\u2606';
+                return '<div class="memory-item' + selectedClass + '" data-id="' + mem.id + '" onclick="highlightMemoryInGraph(' + mem.id + ')">' +
+                    '<div class="memory-header">' +
+                        '<div class="memory-title"><span class="' + starClass + '" onclick="toggleFavorite(' + mem.id + ', this); event.stopPropagation();">' + starIcon + '</span><span class="id">#' + mem.id + '</span><span class="headline">' + escapeHtmlText(headline) + '</span></div>' +
+                        '<div class="memory-actions">' +
+                            '<span class="memory-date">' + mem.created + '</span>' +
+                            '<button class="details-btn" onclick="showMemoryDetails(' + mem.id + '); event.stopPropagation();">Details</button>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="memory-preview">' + escapeHtmlText(preview) + '</div>' +
+                '</div>';
+            }).join('');
+            var emptyMsg = timelineFilter === 'favorites' ? 'No favorites yet \u2014 click \u2606 to star a memory' : 'No memories';
+            var hasMore = timelineFilter === 'all' && timelineOffset < timelineTotal;
+            var loadMoreBtn = hasMore
+                ? '<div style="padding:12px 20px;text-align:center;"><button onclick="loadTimelinePage()" style="background:#238636;color:#fff;border:none;border-radius:6px;padding:6px 16px;cursor:pointer;font-size:13px;">Load more (' + (timelineTotal - timelineOffset) + ' remaining)</button></div>'
+                : '';
+            document.getElementById('timeline-list').innerHTML = (html + loadMoreBtn) || '<div style="padding:20px;color:#8b949e;">' + emptyMsg + '</div>';
+
+            var selected = document.querySelector('#timeline-list .memory-item.selected');
+            if (selected) selected.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        }
+
+        function toggleFavorite(memId, el) {
+            var isActive = el.classList.contains('active');
+            var newState = !isActive;
+            el.classList.toggle('active', newState);
+            el.textContent = newState ? '\u2605' : '\u2606';
+            if (cachedTimelineMemories) {
+                cachedTimelineMemories.forEach(function(mem) {
+                    if (mem.id === memId) {
+                        if (!mem.metadata) mem.metadata = {};
+                        if (newState) { mem.metadata.favorite = true; } else { delete mem.metadata.favorite; }
+                    }
+                });
+            }
+            var dbParam = new URLSearchParams(window.location.search).get('db');
+            var url = '/api/memories/' + memId + (dbParam ? '?db=' + dbParam : '');
+            fetch(url, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ favorite: newState })
+            });
+        }
+
+        function populateHistoryList() {
+            var dbParam = new URLSearchParams(window.location.search).get('db');
+            var url = '/api/actions?limit=200' + (dbParam ? '&db=' + dbParam : '');
+            fetch(url)
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data.actions) renderHistoryList(data.actions);
+                })
+                .catch(function() {
+                    document.getElementById('history-list').innerHTML = '<div style="padding:20px;color:#8b949e;">Could not load action history.</div>';
+                });
+        }
+
+        function renderHistoryList(actions) {
+            var iconMap = { create: '+', update: '~', delete: 'x', boost: '^', link: '&rarr;', unlink: '&times;', merge: '&oplus;' };
+            var existingIds = graphData ? new Set(graphData.nodes.map(function(n) { return n.id; })) : new Set();
+            // Group consecutive actions with same action type
+            var grouped = [];
+            actions.forEach(function(a) {
+                var last = grouped[grouped.length - 1];
+                if (last && last.action === a.action) {
+                    last.items.push(a);
+                    last.last_ts = a.timestamp;
+                } else {
+                    grouped.push({ action: a.action, items: [a], timestamp: a.timestamp, last_ts: a.timestamp });
+                }
+            });
+            var html = grouped.map(function(g) {
+                var icon = iconMap[g.action] || '?';
+                var cls = g.action;
+                if (g.items.length === 1) {
+                    var a = g.items[0];
+                    var summary = escapeHtmlText(a.summary).replace(/#(\d+)/g, function(match, id) {
+                        if (existingIds.has(parseInt(id, 10))) {
+                            return '<span class="mem-link" onclick="showMemoryDetails(' + id + '); event.stopPropagation();">#' + id + '</span>';
+                        }
+                        return '<span class="mem-link deleted">#' + id + '</span>';
+                    });
+                    return '<div class="action-item">' +
+                        '<div class="action-icon ' + cls + '">' + icon + '</div>' +
+                        '<div class="action-body">' +
+                            '<div class="action-summary">' + summary + '</div>' +
+                            '<div class="action-time">' + a.timestamp + '</div>' +
+                        '</div>' +
+                    '</div>';
+                }
+                // Collapsed group
+                var ids = g.items.map(function(a) { return a.memory_id; });
+                var idLinks = ids.map(function(mid) {
+                    if (existingIds.has(mid)) {
+                        return '<span class="mem-link" onclick="showMemoryDetails(' + mid + '); event.stopPropagation();">#' + mid + '</span>';
+                    }
+                    return '<span class="mem-link deleted">#' + mid + '</span>';
+                }).join(', ');
+                var label = g.action.charAt(0).toUpperCase() + g.action.slice(1) + 'd';
+                return '<div class="action-item">' +
+                    '<div class="action-icon ' + cls + '">' + icon + '</div>' +
+                    '<div class="action-body">' +
+                        '<div class="action-summary">' + label + ' ' + g.items.length + ' memories: ' + idLinks + '</div>' +
+                        '<div class="action-time">' + g.timestamp + '</div>' +
+                    '</div>' +
+                '</div>';
+            }).join('');
+            document.getElementById('history-list').innerHTML = html || '<div style="padding:20px;color:#8b949e;">No actions recorded yet.</div>';
+        }
+
+        function highlightMemoryInGraph(memId) {
+            memId = parseInt(memId, 10);
+            if (typeof focusOnNode !== 'undefined') {
+                focusOnNode(memId);
+            }
+            currentPanelMemoryId = memId;
+            document.querySelectorAll('#timeline-list .memory-item').forEach(function(el) {
+                el.classList.toggle('selected', parseInt(el.dataset.id, 10) === memId);
+            });
+            fetch('/api/memories/' + memId + getDbParam())
+                .then(function(r) { return r.json(); })
+                .then(function(mem) {
+                    if (!mem.error) {
+                        highlightMemorySection(mem);
+                    }
+                });
+        }
+
+        function highlightMemorySection(mem) {
+            document.querySelectorAll('.subsection-item.selected, .section-item.selected, .legend-item.selected').forEach(function(el) { el.classList.remove('selected'); });
+            if (!mem.metadata) return;
+            if (mem.metadata.type === 'issue' && mem.metadata.status) {
+                var statusKey = mem.metadata.status;
+                if (statusKey === 'closed' && mem.metadata.closed_reason) {
+                    statusKey = 'closed:' + mem.metadata.closed_reason;
+                }
+                var issueEl = document.querySelector('.legend-item.issue-status[data-status="' + statusKey + '"]');
+                if (issueEl) issueEl.classList.add('selected');
+            } else if (mem.metadata.type === 'todo' && mem.metadata.status) {
+                var statusKey = mem.metadata.status;
+                if (statusKey === 'closed' && mem.metadata.closed_reason) {
+                    statusKey = 'closed:' + mem.metadata.closed_reason;
+                }
+                var todoEl = document.querySelector('.legend-item.todo-status[data-todo-status="' + statusKey + '"]');
+                if (todoEl) todoEl.classList.add('selected');
+            } else {
+                var section, subsection;
+                var hierarchy = mem.metadata.hierarchy;
+                if (hierarchy && hierarchy.path && hierarchy.path.length >= 1) {
+                    section = hierarchy.path[0];
+                    subsection = hierarchy.path.slice(1).join('/');
+                } else {
+                    section = mem.metadata.section;
+                    subsection = mem.metadata.subsection;
+                }
+                if (section) {
+                    var sectionEl = document.querySelector('.section-item[data-section="' + section + '"]');
+                    if (sectionEl) sectionEl.classList.add('selected');
+                    if (subsection) {
+                        var path = section + '/' + subsection;
+                        var el = document.querySelector('.subsection-item[data-subsection="' + path + '"]');
+                        if (el) el.classList.add('selected');
+                    }
+                }
+            }
+        }
+
+        function showMemoryDetails(memId) {
+            memId = parseInt(memId, 10);
+            // Open the right panel immediately
+            document.getElementById('panel').classList.add('active');
+            document.getElementById('resize-handle').classList.add('active');
+            switchTab('detail');
+            document.getElementById('panel-title').textContent = 'Memory #' + memId;
+            // Focus and highlight the node + connected nodes in the graph
+            if (typeof network !== 'undefined' && network && nodes && nodes.get(memId)) {
+                focusOnNode(memId);
+                // Wait for DOM reflow so vis.js sees the updated canvas size after panel opens
+                requestAnimationFrame(function() {
+                    network.redraw();
+                    // Only compensate for left-side overlays (chat panel covers left of canvas)
+                    var chatW = document.getElementById('chat-panel').classList.contains('open') ? 540 : 0;
+                    var sidebarW = document.getElementById('sidebar-wrapper').classList.contains('open') ? (document.getElementById('sidebar-wrapper').offsetWidth + 10) : 0;
+                    var leftObscured = Math.max(chatW, sidebarW);
+                    network.focus(memId, { scale: 0.7, offset: { x: leftObscured / 2, y: 0 }, animation: { duration: 400, easingFunction: 'easeInOutQuad' } });
+                    network.selectNodes([memId]);
+                });
+            }
+            if (memoryCache[memId]) {
+                showPanel(memoryCache[memId]);
+            } else {
+                fetch('/api/memories/' + memId + getDbParam())
+                    .then(function(r) { return r.json(); })
+                    .then(function(mem) {
+                        if (!mem.error) {
+                            memoryCache[memId] = mem;
+                            showPanel(mem);
+                        }
+                    });
+            }
+        }
+
+        function getMemoryHeadline(content) {
+            var lines = content.split('\n').filter(function(l) { return l.trim(); });
+            var first = lines[0] || '';
+            return first.replace(/^#+\s*/, '').substring(0, 80);
+        }
+
+        function getMemoryPreview(content) {
+            var lines = content.split('\n').filter(function(l) { return l.trim() && !l.match(/^#+/); });
+            return lines.slice(0, 2).join(' ').substring(0, 150);
+        }
+
+        function escapeHtmlText(text) {
+            var div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function compactToken(value, maxLen) {
+            var v = String(value || '');
+            if (v.length <= maxLen) return v;
+            return v.slice(0, Math.max(1, maxLen - 3)) + '...';
+        }
+
+        function renderTagGroups(tags) {
+            var list = Array.isArray(tags) ? tags.slice() : [];
+            if (list.length === 0) return '';
+            var technical = [];
+            var human = [];
+            list.forEach(function(tag) {
+                var t = String(tag || '');
+                if (t.startsWith('eventkey:') || t.startsWith('payload_hash:') || t.startsWith('idempotency:') || t.startsWith('project_key:') || t.startsWith('session_key:') || t.startsWith('segment_key:')) {
+                    technical.push(t);
+                } else {
+                    human.push(t);
+                }
+            });
+
+            var humanHtml = human.map(function(t) {
+                return '<span class="tag" onclick="filterByTag(\'' + t + '\'); event.stopPropagation();">' + t + '</span>';
+            }).join('');
+
+            if (technical.length === 0) return humanHtml;
+
+            var technicalHtml = technical.map(function(t) {
+                return '<span class="tag" onclick="filterByTag(\'' + t + '\'); event.stopPropagation();">' + t + '</span>';
+            }).join('');
+
+            return humanHtml +
+                '<details class="raw-technical"><summary>Tags tecnicas (' + technical.length + ')</summary>' +
+                '<div style="margin-top:6px;">' + technicalHtml + '</div></details>';
+        }
+
+        function renderCanonicalSummary(mem) {
+            var md = (mem && mem.metadata) ? mem.metadata : {};
+            var canonical = md.canonical || {};
+            var secondary = Array.isArray(md.cluster_secondary) ? md.cluster_secondary.join(', ') : '';
+            var rows = [
+                ['Cluster primario', md.cluster_primary || '-'],
+                ['Clusters secundarios', secondary || '-'],
+                ['Sessao', md.session_id || '-'],
+                ['Secao', md.section || '-'],
+                ['Fator atomico', md.atomic_factor || '-'],
+                ['Visibilidade', md.visibility || 'active'],
+                ['o_opp', '<code title="' + escapeHtmlText(String(canonical.o_opp || '')) + '">' + escapeHtmlText(compactToken(canonical.o_opp || '-', 72)) + '</code>'],
+                ['v_vdd', '<code title="' + escapeHtmlText(String(canonical.v_vdd || '')) + '">' + escapeHtmlText(compactToken(canonical.v_vdd || '-', 72)) + '</code>'],
+                ['Idempotencia', '<code title="' + escapeHtmlText(String(canonical.idempotency_key || '')) + '">' + escapeHtmlText(compactToken(canonical.idempotency_key || '-', 28)) + '</code>']
+            ];
+
+            var html = '<div class="canonical-summary"><h3>Resumo Canonico (legivel)</h3><table><tbody>';
+            rows.forEach(function(row) {
+                html += '<tr><th>' + row[0] + '</th><td>' + row[1] + '</td></tr>';
+            });
+            html += '</tbody></table>';
+            html += '<details class="raw-technical"><summary>Detalhe tecnico completo</summary><pre><code>' +
+                escapeHtmlText(JSON.stringify({
+                    content: mem.content,
+                    canonical: canonical,
+                    event_key: md.event_key
+                }, null, 2)) +
+                '</code></pre></details></div>';
+            return html;
+        }
+
+        function renderMemoryBody(mem) {
+            var eventType = String((mem && mem.metadata && mem.metadata.event_type) || '');
+            var mdContent = renderMarkdown(mem.content || '');
+            if (eventType === 'canonical_segment') {
+                return renderCanonicalSummary(mem) + mdContent;
+            }
+            return mdContent;
+        }
+
+        function closePanel() {
+            document.getElementById('panel').classList.remove('active');
+            document.getElementById('resize-handle').classList.remove('active');
+            document.body.classList.remove('panel-open');
+            currentPanelMemoryId = null;
+            document.querySelectorAll('.subsection-item.selected, .section-item.selected').forEach(el => el.classList.remove('selected'));
+            updateTimelinePosition();
+        }
+
+        function showPanel(mem) {
+            currentPanelMemoryId = mem.id;
+
+            if (currentTab !== 'detail') {
+                document.querySelectorAll('#panel-tabs .tab').forEach(function(t) { t.classList.remove('active'); });
+                document.querySelector('#panel-tabs .tab[onclick*="detail"]').classList.add('active');
+                document.getElementById('tab-detail').classList.add('active');
+                document.getElementById('tab-timeline').classList.remove('active');
+                document.getElementById('tab-history').classList.remove('active');
+                document.getElementById('tab-canvas').classList.remove('active');
+                currentTab = 'detail';
+            }
+
+            document.getElementById('panel-title').textContent = 'Memory #' + mem.id;
+
+            var badgesHtml = renderIssueBadges(mem.metadata) + renderTodoBadges(mem.metadata);
+            var metaHtml = badgesHtml + 'Created: ' + mem.created;
+            if (mem.updated) {
+                metaHtml += '<br>Updated: ' + mem.updated;
+            }
+            if (mem.metadata && mem.metadata.event_type) {
+                metaHtml += '<br>Type: <code>' + escapeHtmlText(String(mem.metadata.event_type)) + '</code>';
+            }
+            if (mem.metadata && mem.metadata.section) {
+                metaHtml += '<br>Section: <code>' + escapeHtmlText(String(mem.metadata.section)) + '</code>';
+            }
+            document.getElementById('panel-meta').innerHTML = metaHtml;
+
+            document.getElementById('panel-tags').innerHTML = renderTagGroups(mem.tags);
+
+            document.getElementById('panel-content').innerHTML = renderMemoryBody(mem);
+            renderMermaidBlocks();
+            document.getElementById('panel-content').innerHTML += renderImages(mem.metadata);
+            document.getElementById('panel').classList.add('active');
+            document.getElementById('resize-handle').classList.add('active');
+            document.body.classList.add('panel-open');
+
+            highlightMemorySection(mem);
+            updateTimelinePosition();
+        }
+
+        // Resize handle
+        var resizeHandle = document.getElementById('resize-handle');
+        var panel = document.getElementById('panel');
+        var isResizing = false;
+
+        resizeHandle.addEventListener('mousedown', function(e) {
+            isResizing = true;
+            resizeHandle.classList.add('dragging');
+            document.body.style.cursor = 'ew-resize';
+            e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', function(e) {
+            if (!isResizing) return;
+            var newWidth = window.innerWidth - e.clientX;
+            if (newWidth >= 200 && newWidth <= 800) {
+                panel.style.width = newWidth + 'px';
+                updateTimelinePosition();
+            }
+        });
+
+        document.addEventListener('mouseup', function() {
+            isResizing = false;
+            resizeHandle.classList.remove('dragging');
+            document.body.style.cursor = '';
+        });
+
+        // Timeline slider
+        var timelineData = null;
+        var timelineActive = false;
+
+        function initTimeline(nodeTimestamps, minDate, maxDate) {
+            if (!nodeTimestamps || Object.keys(nodeTimestamps).length === 0) return;
+
+            timelineData = {
+                timestamps: nodeTimestamps,
+                minTime: new Date(minDate).getTime(),
+                maxTime: new Date(maxDate).getTime(),
+                sortedNodes: Object.entries(nodeTimestamps)
+                    .map(([id, ts]) => ({ id: parseInt(id), time: new Date(ts).getTime() }))
+                    .sort((a, b) => a.time - b.time)
+            };
+
+            document.getElementById('timeline-min-date').textContent = formatDate(minDate);
+            document.getElementById('timeline-max-date').textContent = formatDate(maxDate);
+
+            var slider = document.getElementById('timeline-slider');
+            slider.value = 100;
+            updateTimelineProgress(100);
+
+            document.getElementById('timeline-container').style.display = 'block';
+        }
+
+        function formatDate(dateStr) {
+            var d = new Date(dateStr);
+            return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' });
+        }
+
+        function updateTimelineProgress(percent) {
+            var slider = document.getElementById('timeline-slider');
+            slider.style.background = 'linear-gradient(to right, #238636 0%, #58a6ff ' + percent + '%, #30363d ' + percent + '%)';
+        }
+
+        function onTimelineChange(value) {
+            if (!timelineData) return;
+
+            exitFocusMode();
+
+            timelineActive = true;
+            var percent = parseInt(value);
+            updateTimelineProgress(percent);
+
+            var timeRange = timelineData.maxTime - timelineData.minTime;
+            var cutoffTime = timelineData.minTime + (timeRange * percent / 100);
+
+            var cutoffDate = new Date(cutoffTime);
+            document.getElementById('timeline-current').textContent =
+                'Showing: ' + formatDate(cutoffDate.toISOString());
+
+            var visibleIds = new Set();
+            for (var n of graphData.nodes) {
+                if (!timelineData.timestamps[n.id]) {
+                    visibleIds.add(n.id);
+                }
+            }
+            for (var node of timelineData.sortedNodes) {
+                if (node.time <= cutoffTime) {
+                    visibleIds.add(node.id);
+                }
+            }
+
+            var nodeUpdates = graphData.nodes.map(function(n) {
+                if (visibleIds.has(n.id)) {
+                    var nodeTime = timelineData.timestamps[n.id] ? new Date(timelineData.timestamps[n.id]).getTime() : 0;
+                    var recency = (nodeTime - timelineData.minTime) / timeRange;
+                    var isRecent = Math.abs(nodeTime - cutoffTime) < (timeRange * 0.05);
+                    return {
+                        id: n.id,
+                        opacity: 1,
+                        borderWidth: isRecent ? 4 : (n.borderWidth || 2),
+                        color: isRecent ? { background: n.color.background || n.color, border: '#58a6ff' } : n.color
+                    };
+                } else {
+                    return { id: n.id, opacity: 0.08 };
+                }
+            });
+
+            var edgeUpdates = graphData.edges.map(function(e) {
+                if (visibleIds.has(e.from) && visibleIds.has(e.to)) {
+                    return { id: e.id, hidden: false, color: e.color || 'rgba(48,54,61,0.6)' };
+                } else {
+                    return { id: e.id, hidden: true };
+                }
+            });
+
+            nodes.update(nodeUpdates);
+            edges.update(edgeUpdates);
+        }
+
+        function updateTimelinePosition() {
+            var timeline = document.getElementById('timeline-container');
+            if (!timeline) return;
+            var panel = document.getElementById('panel');
+            var panelOpen = panel && panel.classList.contains('active');
+            if (panelOpen) {
+                var panelWidth = panel.offsetWidth || 560;
+                timeline.style.left = 'calc(50% - ' + (panelWidth / 2) + 'px)';
+            } else {
+                timeline.style.left = '50%';
+            }
+        }
+
+        function resetTimeline() {
+            if (!timelineData) return;
+
+            timelineActive = false;
+            var slider = document.getElementById('timeline-slider');
+            slider.value = 100;
+            updateTimelineProgress(100);
+            document.getElementById('timeline-current').textContent = 'Drag to filter by time';
+
+            var nodeUpdates = graphData.nodes.map(function(n) {
+                return { id: n.id, opacity: 1, borderWidth: n.borderWidth || 2, color: n.color };
+            });
+            var edgeUpdates = graphData.edges.map(function(e) {
+                return { id: e.id, hidden: false, color: e.color || 'rgba(48,54,61,0.6)' };
+            });
+
+            nodes.update(nodeUpdates);
+            edges.update(edgeUpdates);
+        }
+
+        // Main graph loading
+        async function loadGraph() {
+            try {
+                const response = await fetch('/api/graph' + getDbParam());
+                graphData = await response.json();
+                if (graphData.error) {
+                    document.getElementById('loading').textContent = graphData.message || 'No memories found';
+                    return;
+                }
+                applyLatestHighlightToNodes();
+                initGraph();
+            } catch (e) {
+                document.getElementById('loading').textContent = 'Error loading graph: ' + e.message;
+            }
+        }
+
+        // Cluster visualization functions
+        function computeConvexHull(points) {
+            if (points.length <= 1) return points;
+            points.sort(function(a, b) { return a.x - b.x || a.y - b.y; });
+            if (points.length <= 2) return points.slice();
+            var lower = [];
+            for (var i = 0; i < points.length; i++) {
+                while (lower.length >= 2 && cross(lower[lower.length-2], lower[lower.length-1], points[i]) <= 0)
+                    lower.pop();
+                lower.push(points[i]);
+            }
+            var upper = [];
+            for (var i = points.length - 1; i >= 0; i--) {
+                while (upper.length >= 2 && cross(upper[upper.length-2], upper[upper.length-1], points[i]) <= 0)
+                    upper.pop();
+                upper.push(points[i]);
+            }
+            upper.pop();
+            lower.pop();
+            return lower.concat(upper);
+        }
+
+        function cross(O, A, B) {
+            return (A.x - O.x) * (B.y - O.y) - (A.y - O.y) * (B.x - O.x);
+        }
+
+        function expandHull(hull, padding) {
+            if (hull.length < 3) return hull;
+            var cx = 0, cy = 0;
+            for (var i = 0; i < hull.length; i++) { cx += hull[i].x; cy += hull[i].y; }
+            cx /= hull.length; cy /= hull.length;
+            var expanded = [];
+            for (var i = 0; i < hull.length; i++) {
+                var dx = hull[i].x - cx, dy = hull[i].y - cy;
+                var dist = Math.sqrt(dx*dx + dy*dy);
+                if (dist === 0) { expanded.push({x: hull[i].x, y: hull[i].y}); continue; }
+                expanded.push({x: hull[i].x + dx/dist * padding, y: hull[i].y + dy/dist * padding});
+            }
+            return expanded;
+        }
+
+        function drawSmoothClosed(ctx, hull) {
+            var n = hull.length;
+            if (n < 3) return;
+            ctx.beginPath();
+            for (var i = 0; i < n; i++) {
+                var p0 = hull[(i - 1 + n) % n];
+                var p1 = hull[i];
+                var p2 = hull[(i + 1) % n];
+                var p3 = hull[(i + 2) % n];
+                var tension = 6;
+                var cp1x = p1.x + (p2.x - p0.x) / tension;
+                var cp1y = p1.y + (p2.y - p0.y) / tension;
+                var cp2x = p2.x - (p3.x - p1.x) / tension;
+                var cp2y = p2.y - (p3.y - p1.y) / tension;
+                if (i === 0) ctx.moveTo(p1.x, p1.y);
+                ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y);
+            }
+            ctx.closePath();
+        }
+
+        function drawClusterHulls(ctx) {
+            var clusterToNodes = graphData ? graphData.clusterToNodes : {};
+            var clusterColors = graphData ? graphData.clusterColors : {};
+            if (!clusterToNodes || !clusterColors) return;
+
+            for (var cid in clusterToNodes) {
+                var memberIds = clusterToNodes[cid];
+                if (!memberIds || memberIds.length < 3) continue;
+
+                var positions = network.getPositions(memberIds);
+                var points = [];
+                for (var id of memberIds) {
+                    if (positions[id]) points.push({x: positions[id].x, y: positions[id].y});
+                }
+                if (points.length < 3) continue;
+
+                var hull = computeConvexHull(points);
+                if (hull.length < 3) continue;
+                hull = expandHull(hull, 45);
+
+                var color = clusterColors[cid] || '#8b949e';
+                ctx.save();
+                drawSmoothClosed(ctx, hull);
+                ctx.fillStyle = color + '14';
+                ctx.fill();
+                ctx.strokeStyle = color + '55';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.restore();
+            }
+        }
+
+        function applyLayoutCoordinates(nodeArray) {
+            var coords = graphData && graphData.layoutMeta && graphData.layoutMeta.coords
+                ? graphData.layoutMeta.coords
+                : {};
+            if (!coords || !nodeArray || !nodeArray.length) return;
+            for (var i = 0; i < nodeArray.length; i++) {
+                var node = nodeArray[i];
+                var c = coords[String(node.id)] || coords[node.id];
+                if (!c) continue;
+                node.x = Number(c.x);
+                node.y = Number(c.y);
+            }
+        }
+
+        function initClusterHulls() {
+            var clusterToNodes = graphData ? graphData.clusterToNodes : {};
+            if (!clusterToNodes || Object.keys(clusterToNodes).length === 0) return;
+            network.on('afterDrawing', function(ctx) { drawClusterHulls(ctx); });
+        }
+
+        function initGraph() {
+            document.getElementById('loading').remove();
+
+            // Build tag legend
+            var legendHtml = '';
+            var latest = graphData.latestMemory || null;
+            var latestPrimaryTag = latest && latest.primaryTag ? latest.primaryTag : null;
+            renderLatestIndicator();
+            var tagEntries = getSortedTagEntries(64);
+            if (tagEntries.length === 0) {
+                legendHtml = '<div class="legend-item legend-empty">No tags detected</div>';
+            } else {
+                for (var [tag, color, tagCount] of tagEntries) {
+                    var isLatestTag = latestPrimaryTag && tag === latestPrimaryTag;
+                    var latestBadge = isLatestTag ? '<span class="latest-badge">LATEST</span>' : '';
+                    var latestClass = isLatestTag ? ' latest-related' : '';
+                    legendHtml += '<div class="legend-item' + latestClass + '" data-tag="' + tag + '" onclick="filterByTag(\'' + tag + '\')"><span class="legend-color" style="background:' + color + '"></span>' + tag + ' (' + tagCount + ')' + latestBadge + '</div>';
+                }
+            }
+            document.getElementById('legend-items').innerHTML = legendHtml;
+            var categoryNodeSets = {};
+            for (var tagName of Object.keys(graphData.tagToNodes || {})) {
+                var category = tagCategory(tagName);
+                if (!categoryNodeSets[category]) categoryNodeSets[category] = new Set();
+                for (var nid of (graphData.tagToNodes[tagName] || [])) {
+                    categoryNodeSets[category].add(nid);
+                }
+            }
+            var catHtml = '';
+            var catColors = { section: '#a855f7', atomic: '#0ea5e9', agentic: '#22c55e', memora: '#14b8a6', other: '#8b949e' };
+            var sortedCats = Object.keys(categoryNodeSets).sort();
+            if (sortedCats.length > 0) {
+                catHtml = '<div class="todo-categories"><b>Categories</b><div class="section-items">';
+                for (var cat of sortedCats) {
+                    var catColor = catColors[cat] || '#8b949e';
+                    var catCount = categoryNodeSets[cat].size;
+                    catHtml += '<div class="legend-item tag-category" data-tag-category="' + cat + '" onclick="filterByTagCategory(\'' + cat + '\')"><span class="legend-color" style="background:' + catColor + '"></span>' + cat + ' (' + catCount + ')</div>';
+                }
+                catHtml += '</div></div>';
+            }
+            document.getElementById('tag-categories-items').innerHTML = catHtml;
+
+            // Build issues legend
+            var issuesHtml = '';
+            if (graphData.statusToNodes && Object.keys(graphData.statusToNodes).length > 0) {
+                issuesHtml = '<div id="issues-legend"><b onclick="filterAllIssues()">Issues</b>';
+                var statusColors = {open: '#ff7b72', 'closed:complete': '#7ee787', 'closed:not_planned': '#8b949e'};
+                for (var [status, nodeIds] of Object.entries(graphData.statusToNodes)) {
+                    var color = statusColors[status] || '#8b949e';
+                    var displayName = status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    issuesHtml += '<div class="legend-item issue-status" data-status="' + status + '" onclick="filterByStatus(\'' + status + '\')"><span class="legend-color" style="background:' + color + '"></span>' + displayName + ' (' + nodeIds.length + ')</div>';
+                }
+                if (graphData.issueCategoryToNodes && Object.keys(graphData.issueCategoryToNodes).length > 0) {
+                    issuesHtml += '<div class="issue-categories"><b>Components</b><span class="legend-toggle" onclick="toggleSection(this)">[-]</span><div class="section-items">';
+                    var components = Object.keys(graphData.issueCategoryToNodes).sort();
+                    for (var component of components) {
+                        var count = graphData.issueCategoryToNodes[component].length;
+                        issuesHtml += '<div class="legend-item issue-category" data-issue-category="' + component + '" onclick="filterByIssueCategory(\'' + component + '\')"><span class="legend-color small" style="background:#8b949e"></span>' + component + ' (' + count + ')</div>';
+                    }
+                    issuesHtml += '</div></div>';
+                }
+                issuesHtml += '</div>';
+            }
+            document.getElementById('issues-legend-items').innerHTML = issuesHtml;
+
+            // Build TODOs legend
+            var todosHtml = '';
+            if (graphData.todoStatusToNodes && Object.keys(graphData.todoStatusToNodes).length > 0) {
+                todosHtml = '<div id="todos-legend"><b onclick="filterAllTodos()">TODOs</b>';
+                var todoStatusColors = {open: '#58a6ff', 'closed:complete': '#7ee787', 'closed:not_planned': '#8b949e'};
+                var todoStatusDisplay = {open: 'Open', 'closed:complete': 'Closed (Complete)', 'closed:not_planned': 'Closed (Not Planned)'};
+                for (var [status, nodeIds] of Object.entries(graphData.todoStatusToNodes)) {
+                    var color = todoStatusColors[status] || '#8b949e';
+                    var displayName = todoStatusDisplay[status] || status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    todosHtml += '<div class="legend-item todo-status" data-todo-status="' + status + '" onclick="filterByTodoStatus(\'' + status + '\')"><span class="legend-color" style="background:' + color + '"></span>' + displayName + ' (' + nodeIds.length + ')</div>';
+                }
+                if (graphData.todoCategoryToNodes && Object.keys(graphData.todoCategoryToNodes).length > 0) {
+                    todosHtml += '<div class="todo-categories"><b>Categories</b><span class="legend-toggle" onclick="toggleSection(this)">[-]</span><div class="section-items">';
+                    var categories = Object.keys(graphData.todoCategoryToNodes).sort();
+                    for (var category of categories) {
+                        var count = graphData.todoCategoryToNodes[category].length;
+                        todosHtml += '<div class="legend-item todo-category" data-todo-category="' + category + '" onclick="filterByTodoCategory(\'' + category + '\')"><span class="legend-color small" style="background:#8b949e"></span>' + category + ' (' + count + ')</div>';
+                    }
+                    todosHtml += '</div></div>';
+                }
+                todosHtml += '</div>';
+            }
+            document.getElementById('todos-legend-items').innerHTML = todosHtml;
+
+            // Build duplicates legend
+            var duplicatesHtml = '';
+            if (graphData.duplicateIds && graphData.duplicateIds.length > 0) {
+                duplicatesHtml = '<div id="duplicates-legend"><div class="legend-item" onclick="filterByDuplicates()"><span class="legend-color" style="background:#a855f7;border:2px solid #f85149;"></span>Duplicates (' + graphData.duplicateIds.length + ')</div></div>';
+            }
+            document.getElementById('duplicates-legend-items').innerHTML = duplicatesHtml;
+
+            function toggleTags() {
+                // Tags remain visible by default to avoid hiding critical taxonomy context.
+            }
+            window.toggleTags = toggleTags;
+
+            // Build sections
+            var sectionsHtml = '';
+            var latestSection = latest && latest.section ? latest.section : null;
+            for (var [section, nodeIds] of Object.entries(graphData.sectionToNodes)) {
+                var sectionClass = (latestSection && section === latestSection) ? 'section-item latest-related' : 'section-item';
+                sectionsHtml += '<div class="' + sectionClass + '" data-section="' + section + '" onclick="filterBySection(\'' + section + '\')">' + section + ' (' + nodeIds.length + ')</div>';
+                var sectionPaths = Object.keys(graphData.subsectionToNodes).filter(k => k.startsWith(section + '/')).sort();
+                var rendered = new Set();
+                for (var fullPath of sectionPaths) {
+                    var subPath = fullPath.slice(section.length + 1);
+                    var parts = subPath.split('/');
+                    for (var i = 0; i < parts.length; i++) {
+                        var partial = parts.slice(0, i + 1).join('/');
+                        var renderKey = section + '/' + partial;
+                        if (!rendered.has(renderKey)) {
+                            rendered.add(renderKey);
+                            var indent = '&nbsp;&nbsp;'.repeat(i);
+                            var count = (graphData.subsectionToNodes[renderKey] || []).length;
+                            sectionsHtml += '<div class="subsection-item" data-subsection="' + renderKey + '" onclick="filterBySubsection(\'' + renderKey + '\')" style="padding-left:' + (8 + i*12) + 'px;">' + indent + '\u2514 ' + parts[i] + ' (' + count + ')</div>';
+                        }
+                    }
+                }
+            }
+            document.getElementById('section-items').innerHTML = sectionsHtml;
+
+            // Apply deterministic organogram coordinates before vis.js init
+            applyLayoutCoordinates(graphData.nodes);
+
+            // Init vis.js
+            nodes = new vis.DataSet(graphData.nodes);
+            // Color edges between duplicates red
+            var duplicateSet = new Set(graphData.duplicateIds || []);
+            var processedEdges = graphData.edges.map(function(e) {
+                if (duplicateSet.has(e.from) && duplicateSet.has(e.to)) {
+                    return Object.assign({}, e, { color: { color: '#f85149', opacity: 0.8 } });
+                }
+                return e;
+            });
+            graphData.edges = processedEdges;
+            edges = new vis.DataSet(processedEdges);
+            var container = document.getElementById('graph');
+            var data = { nodes: nodes, edges: edges };
+            var options = {
+                nodes: { shape: 'dot', size: 16, font: { color: '#c9d1d9', size: 11 }, borderWidth: 2 },
+                edges: { color: { color: '#30363d', opacity: 0.6 }, smooth: false },
+                physics: false,
+                layout: { improvedLayout: false },
+                interaction: { hover: true, tooltipDelay: 99999 }
+            };
+            network = new vis.Network(container, data, options);
+            updateFilterControls();
+            buildExplorer();
+            loadViews();
+            applyCanvasFilters(true);
+
+            // Init cluster hull overlays
+            initClusterHulls();
+
+            network.on('click', async function(params) {
+                hideNodeTooltip();
+                if (params.nodes.length > 0) {
+                    var nodeId = params.nodes[0];
+                    focusOnNode(nodeId);
+                    await showMemoryAsync(nodeId);
+                    // Panel opened and canvas may have shrunk — re-center the node
+                    requestAnimationFrame(function() {
+                        network.redraw();
+                        var chatW = document.getElementById('chat-panel').classList.contains('open') ? 540 : 0;
+                        var sidebarW = document.getElementById('sidebar-wrapper').classList.contains('open') ? (document.getElementById('sidebar-wrapper').offsetWidth + 10) : 0;
+                        var leftObscured = Math.max(chatW, sidebarW);
+                        network.focus(nodeId, { scale: network.getScale(), offset: { x: leftObscured / 2, y: 0 }, animation: { duration: 300, easingFunction: 'easeInOutQuad' } });
+                    });
+                } else {
+                    exitFocusMode();
+                }
+            });
+
+            var canvasEl = document.getElementById('graph').getElementsByTagName('canvas')[0];
+            if (canvasEl) {
+                canvasEl.addEventListener('mousedown', handleLassoStart);
+                canvasEl.addEventListener('mousemove', handleLassoMove);
+                canvasEl.addEventListener('mouseup', handleLassoEnd);
+            }
+
+            network.on('hoverNode', function(params) {
+                showNodeTooltip(params.node, params.pointer);
+            });
+
+            network.on('blurNode', function() {
+                hideNodeTooltip();
+            });
+
+            // Initialize timeline if data is available
+            if (graphData.nodeTimestamps && graphData.minDate && graphData.maxDate) {
+                initTimeline(graphData.nodeTimestamps, graphData.minDate, graphData.maxDate);
+            }
+        }
+
+        async function showMemoryAsync(nodeId) {
+            if (!memoryCache[nodeId]) {
+                try {
+                    const response = await fetch('/api/memories/' + nodeId + getDbParam());
+                    memoryCache[nodeId] = await response.json();
+                } catch (e) {
+                    console.error('Error fetching memory:', e);
+                    return;
+                }
+            }
+            var mem = memoryCache[nodeId];
+            if (mem.error) return;
+            showPanel(mem);
+        }
+
+        function searchMemories(query) {
+            if (!query || query.length < 1) {
+                resetFilter();
+                return;
+            }
+            var idMatch = query.match(/^#?(\d+)$/);
+            var matchingIds;
+            if (idMatch) {
+                var searchId = parseInt(idMatch[1], 10);
+                matchingIds = graphData.nodes.filter(n => n.id === searchId).map(n => n.id);
+            } else {
+                query = query.toLowerCase();
+                matchingIds = graphData.nodes.filter(n => n.label.toLowerCase().includes(query)).map(n => n.id);
+            }
+            applyFilter(matchingIds);
+        }
+
+        // Hide DB selector and connection indicator when not needed
+        if (!MEMORA_CONFIG.dbSelector) {
+            var dbSel = document.getElementById('db-selector');
+            if (dbSel) dbSel.style.display = 'none';
+            var connStatus = document.getElementById('connection-status');
+            if (connStatus) connStatus.style.display = 'none';
+        }
+        // Show version from config when set
+        if (MEMORA_CONFIG.version) {
+            var versionEl = document.getElementById('version');
+            if (versionEl) versionEl.innerHTML = '<span id="version-db">' + (MEMORA_CONFIG.dbSelector ? currentDb : 'memora') + '</span> | v' + MEMORA_CONFIG.version;
+        }
+
+        // Initialize database from URL and load graph
+        if (MEMORA_CONFIG.dbSelector) initDbFromUrl();
+        loadGraph();
+
+        // Real-time updates (WebSocket or SSE)
+        var ws = null;
+        var wsReconnectDelay = 1000;
+        var wsMaxReconnectDelay = 30000;
+
+        function connectRealtime() {
+            if (MEMORA_CONFIG.sseUrl) connectSSE();
+            else if (MEMORA_CONFIG.wsUrl) connectWebSocket();
+        }
+
+        function connectSSE() {
+            var es = new EventSource(MEMORA_CONFIG.sseUrl);
+            updateConnectionStatus('connected');
+            es.addEventListener('graph-updated', function() {
+                showUpdateNotification();
+                reloadGraphData();
+            });
+            es.onerror = function() {
+                updateConnectionStatus('disconnected');
+                es.close();
+                setTimeout(connectSSE, 5000);
+            };
+        }
+
+        function connectWebSocket() {
+            try {
+                ws = new WebSocket(MEMORA_CONFIG.wsUrl);
+
+                ws.onopen = function() {
+                    console.log('WebSocket connected');
+                    wsReconnectDelay = 1000;
+                    updateConnectionStatus('connected');
+                };
+
+                ws.onmessage = function(event) {
+                    try {
+                        var data = JSON.parse(event.data);
+                        console.log('WebSocket message:', data);
+
+                        if (data.type === 'graph_updated') {
+                            // Show update notification
+                            showUpdateNotification();
+                            // Reload graph data
+                            reloadGraphData();
+                        } else if (data.type === 'connected') {
+                            console.log('Connected, active clients:', data.connections);
+                        }
+                    } catch (e) {
+                        console.error('WebSocket message parse error:', e);
+                    }
+                };
+
+                ws.onclose = function() {
+                    console.log('WebSocket disconnected, reconnecting in', wsReconnectDelay, 'ms');
+                    updateConnectionStatus('disconnected');
+                    setTimeout(connectWebSocket, wsReconnectDelay);
+                    wsReconnectDelay = Math.min(wsReconnectDelay * 2, wsMaxReconnectDelay);
+                };
+
+                ws.onerror = function(error) {
+                    console.error('WebSocket error:', error);
+                    updateConnectionStatus('error');
+                };
+
+                // Keepalive ping every 30 seconds
+                setInterval(function() {
+                    if (ws && ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({ type: 'ping' }));
+                    }
+                }, 30000);
+
+            } catch (e) {
+                console.error('WebSocket connection error:', e);
+                setTimeout(connectWebSocket, wsReconnectDelay);
+            }
+        }
+
+        function updateConnectionStatus(status) {
+            var indicator = document.getElementById('connection-status');
+            if (!indicator) return;
+
+            indicator.className = 'connection-status ' + status;
+            indicator.title = status === 'connected' ? 'Live updates active' :
+                             status === 'disconnected' ? 'Reconnecting...' : 'Connection error';
+        }
+
+        function showUpdateNotification() {
+            var notification = document.getElementById('update-notification');
+            if (!notification) {
+                notification = document.createElement('div');
+                notification.id = 'update-notification';
+                notification.innerHTML = 'Graph updated!';
+                document.body.appendChild(notification);
+            }
+            notification.classList.add('show');
+            setTimeout(function() {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        async function reloadGraphData() {
+            try {
+                var response = await fetch('/api/graph' + getDbParam());
+                var newData = await response.json();
+                if (newData.error) return;
+
+                // Update graphData
+                graphData = newData;
+                applyLatestHighlightToNodes();
+
+                // Clear memory cache for fresh data
+                memoryCache = {};
+
+                // Update nodes and edges
+                nodes.clear();
+                edges.clear();
+
+                // Reprocess edges for duplicates
+                var duplicateSet = new Set(graphData.duplicateIds || []);
+                var processedEdges = graphData.edges.map(function(e) {
+                    if (duplicateSet.has(e.from) && duplicateSet.has(e.to)) {
+                        return Object.assign({}, e, { color: { color: '#f85149', opacity: 0.8 } });
+                    }
+                    return e;
+                });
+                graphData.edges = processedEdges;
+
+                applyLayoutCoordinates(graphData.nodes);
+                nodes.add(graphData.nodes);
+                edges.add(processedEdges);
+
+                // Update legends
+                updateLegends();
+                updateFilterControls();
+                buildExplorer();
+                applyCanvasFilters(true);
+
+                console.log('Graph reloaded:', graphData.nodes.length, 'nodes');
+            } catch (e) {
+                console.error('Error reloading graph:', e);
+            }
+        }
+
+        function updateLegends() {
+            // Update tag legend
+            var legendHtml = '';
+            var latest = graphData.latestMemory || null;
+            var latestPrimaryTag = latest && latest.primaryTag ? latest.primaryTag : null;
+            renderLatestIndicator();
+            var tagEntries = getSortedTagEntries(64);
+            if (tagEntries.length === 0) {
+                legendHtml = '<div class="legend-item legend-empty">No tags detected</div>';
+            } else {
+                for (var [tag, color, tagCount] of tagEntries) {
+                    var isLatestTag = latestPrimaryTag && tag === latestPrimaryTag;
+                    var latestBadge = isLatestTag ? '<span class="latest-badge">LATEST</span>' : '';
+                    var latestClass = isLatestTag ? ' latest-related' : '';
+                    legendHtml += '<div class="legend-item' + latestClass + '" data-tag="' + tag + '" onclick="filterByTag(\'' + tag + '\')"><span class="legend-color" style="background:' + color + '"></span>' + tag + ' (' + tagCount + ')' + latestBadge + '</div>';
+                }
+            }
+            document.getElementById('legend-items').innerHTML = legendHtml;
+            var categoryNodeSets = {};
+            for (var tagName of Object.keys(graphData.tagToNodes || {})) {
+                var category = tagCategory(tagName);
+                if (!categoryNodeSets[category]) categoryNodeSets[category] = new Set();
+                for (var nid of (graphData.tagToNodes[tagName] || [])) {
+                    categoryNodeSets[category].add(nid);
+                }
+            }
+            var catHtml = '';
+            var catColors = { section: '#a855f7', atomic: '#0ea5e9', agentic: '#22c55e', memora: '#14b8a6', other: '#8b949e' };
+            var sortedCats = Object.keys(categoryNodeSets).sort();
+            if (sortedCats.length > 0) {
+                catHtml = '<div class="todo-categories"><b>Categories</b><div class="section-items">';
+                for (var cat of sortedCats) {
+                    var catColor = catColors[cat] || '#8b949e';
+                    var catCount = categoryNodeSets[cat].size;
+                    catHtml += '<div class="legend-item tag-category" data-tag-category="' + cat + '" onclick="filterByTagCategory(\'' + cat + '\')"><span class="legend-color" style="background:' + catColor + '"></span>' + cat + ' (' + catCount + ')</div>';
+                }
+                catHtml += '</div></div>';
+            }
+            document.getElementById('tag-categories-items').innerHTML = catHtml;
+
+            // Update section items with subsections
+            var sectionsHtml = '';
+            var latestSection = latest && latest.section ? latest.section : null;
+            for (var [section, nodeIds] of Object.entries(graphData.sectionToNodes)) {
+                var sectionClass = (latestSection && section === latestSection) ? 'section-item latest-related' : 'section-item';
+                sectionsHtml += '<div class="' + sectionClass + '" data-section="' + section + '" onclick="filterBySection(\'' + section + '\')">' + section + ' (' + nodeIds.length + ')</div>';
+                var sectionPaths = Object.keys(graphData.subsectionToNodes).filter(k => k.startsWith(section + '/')).sort();
+                var rendered = new Set();
+                for (var fullPath of sectionPaths) {
+                    var subPath = fullPath.slice(section.length + 1);
+                    var parts = subPath.split('/');
+                    for (var i = 0; i < parts.length; i++) {
+                        var partial = parts.slice(0, i + 1).join('/');
+                        var renderKey = section + '/' + partial;
+                        if (!rendered.has(renderKey)) {
+                            rendered.add(renderKey);
+                            var indent = '&nbsp;&nbsp;'.repeat(i);
+                            var count = (graphData.subsectionToNodes[renderKey] || []).length;
+                            sectionsHtml += '<div class="subsection-item" data-subsection="' + renderKey + '" onclick="filterBySubsection(\'' + renderKey + '\')" style="padding-left:' + (8 + i*12) + 'px;">' + indent + '\u2514 ' + parts[i] + ' (' + count + ')</div>';
+                        }
+                    }
+                }
+            }
+            document.getElementById('section-items').innerHTML = sectionsHtml;
+
+            // Update issues legend
+            var issuesHtml = '';
+            if (graphData.statusToNodes && Object.keys(graphData.statusToNodes).length > 0) {
+                issuesHtml = '<div id="issues-legend"><b onclick="filterAllIssues()">Issues</b>';
+                var statusColors = {open: '#ff7b72', 'closed:complete': '#7ee787', 'closed:not_planned': '#8b949e'};
+                for (var [status, nodeIds] of Object.entries(graphData.statusToNodes)) {
+                    var color = statusColors[status] || '#8b949e';
+                    var displayName = status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    issuesHtml += '<div class="legend-item issue-status" data-status="' + status + '" onclick="filterByStatus(\'' + status + '\')"><span class="legend-color" style="background:' + color + '"></span>' + displayName + ' (' + nodeIds.length + ')</div>';
+                }
+                if (graphData.issueCategoryToNodes && Object.keys(graphData.issueCategoryToNodes).length > 0) {
+                    issuesHtml += '<div class="issue-categories"><b>Components</b><span class="legend-toggle" onclick="toggleSection(this)">[-]</span><div class="section-items">';
+                    var components = Object.keys(graphData.issueCategoryToNodes).sort();
+                    for (var component of components) {
+                        var count = graphData.issueCategoryToNodes[component].length;
+                        issuesHtml += '<div class="legend-item issue-category" data-issue-category="' + component + '" onclick="filterByIssueCategory(\'' + component + '\')"><span class="legend-color small" style="background:#8b949e"></span>' + component + ' (' + count + ')</div>';
+                    }
+                    issuesHtml += '</div></div>';
+                }
+                issuesHtml += '</div>';
+            }
+            document.getElementById('issues-legend-items').innerHTML = issuesHtml;
+
+            // Update TODOs legend
+            var todosHtml = '';
+            if (graphData.todoStatusToNodes && Object.keys(graphData.todoStatusToNodes).length > 0) {
+                todosHtml = '<div id="todos-legend"><b onclick="filterAllTodos()">TODOs</b>';
+                var todoStatusColors = {open: '#58a6ff', 'closed:complete': '#7ee787', 'closed:not_planned': '#8b949e'};
+                var todoStatusDisplay = {open: 'Open', 'closed:complete': 'Closed (Complete)', 'closed:not_planned': 'Closed (Not Planned)'};
+                for (var [status, nodeIds] of Object.entries(graphData.todoStatusToNodes)) {
+                    var color = todoStatusColors[status] || '#8b949e';
+                    var displayName = todoStatusDisplay[status] || status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+                    todosHtml += '<div class="legend-item todo-status" data-todo-status="' + status + '" onclick="filterByTodoStatus(\'' + status + '\')"><span class="legend-color" style="background:' + color + '"></span>' + displayName + ' (' + nodeIds.length + ')</div>';
+                }
+                if (graphData.todoCategoryToNodes && Object.keys(graphData.todoCategoryToNodes).length > 0) {
+                    todosHtml += '<div class="todo-categories"><b>Categories</b><span class="legend-toggle" onclick="toggleSection(this)">[-]</span><div class="section-items">';
+                    var categories = Object.keys(graphData.todoCategoryToNodes).sort();
+                    for (var category of categories) {
+                        var count = graphData.todoCategoryToNodes[category].length;
+                        todosHtml += '<div class="legend-item todo-category" data-todo-category="' + category + '" onclick="filterByTodoCategory(\'' + category + '\')"><span class="legend-color small" style="background:#8b949e"></span>' + category + ' (' + count + ')</div>';
+                    }
+                    todosHtml += '</div></div>';
+                }
+                todosHtml += '</div>';
+            }
+            document.getElementById('todos-legend-items').innerHTML = todosHtml;
+
+            // Update duplicates legend
+            var duplicatesHtml = '';
+            if (graphData.duplicateIds && graphData.duplicateIds.length > 0) {
+                duplicatesHtml = '<div id="duplicates-legend"><div class="legend-item" onclick="filterByDuplicates()"><span class="legend-color" style="background:#a855f7;border:2px solid #f85149;"></span>Duplicates (' + graphData.duplicateIds.length + ')</div></div>';
+            }
+            document.getElementById('duplicates-legend-items').innerHTML = duplicatesHtml;
+
+            // Update causal explorer facets/tree
+            buildExplorer();
+
+            // Update timeline if available
+            if (graphData.nodeTimestamps && graphData.minDate && graphData.maxDate) {
+                initTimeline(graphData.nodeTimestamps, graphData.minDate, graphData.maxDate);
+            }
+        }
+
+        // Connect real-time updates after graph loads
+        setTimeout(connectRealtime, 1000);
+
+        // ---- Chat functionality ----
+        var chatHistory = [];
+        var chatOpen = false;
+        var chatStreaming = false;
+        var chatWelcomeShown = false;
+
+        function toggleSidebar() {
+            var wrapper = document.getElementById('sidebar-wrapper');
+            var btn = document.getElementById('sidebar-toggle');
+            wrapper.classList.toggle('open');
+            btn.classList.toggle('open');
+            btn.innerHTML = wrapper.classList.contains('open') ? '&#x2715;' : '&#9776;';
+        }
+
+        function toggleChat() {
+            chatOpen = !chatOpen;
+            var panel = document.getElementById('chat-panel');
+            var toggle = document.getElementById('chat-toggle');
+            if (chatOpen) {
+                panel.classList.add('open');
+                toggle.classList.add('hidden');
+                if (!chatWelcomeShown) {
+                    chatWelcomeShown = true;
+                    var msgs = document.getElementById('chat-messages');
+                    msgs.innerHTML = '<div class="chat-msg welcome">Ask me anything about your memories. I\'ll search your knowledge base and answer based on what I find.</div>';
+                }
+                setTimeout(function() { document.getElementById('chat-input').focus(); }, 300);
+            } else {
+                panel.classList.remove('open');
+                toggle.classList.remove('hidden');
+            }
+        }
+
+        function chatKeyDown(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendChatMessage();
+            }
+        }
+
+        function linkifyMemoryRefs(html) {
+            return html.replace(/\[Memory #(\d+)\]/g, function(match, id) {
+                return '<a class="chat-mem-link" href="#" onclick="showMemoryDetails(' + id + '); return false;">' + match + '</a>';
+            });
+        }
+
+        function autoResizeChatInput(el) {
+            el.style.height = 'auto';
+            el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+        }
+
+        async function sendChatMessage() {
+            if (chatStreaming) return;
+            var input = document.getElementById('chat-input');
+            var message = input.value.trim();
+            if (!message) return;
+
+            input.value = '';
+            input.style.height = 'auto';
+
+            var msgs = document.getElementById('chat-messages');
+
+            // Remove welcome message if present
+            var welcome = msgs.querySelector('.chat-msg.welcome');
+            if (welcome) welcome.remove();
+
+            // Add user message
+            var userDiv = document.createElement('div');
+            userDiv.className = 'chat-msg user';
+            userDiv.textContent = message;
+            msgs.appendChild(userDiv);
+
+            // Add typing indicator
+            var typingDiv = document.createElement('div');
+            typingDiv.className = 'chat-typing';
+            typingDiv.id = 'chat-typing';
+            typingDiv.innerHTML = 'Searching memories <span class="dots"><span>.</span><span>.</span><span>.</span></span>';
+            msgs.appendChild(typingDiv);
+            msgs.scrollTop = msgs.scrollHeight;
+
+            chatStreaming = true;
+            document.getElementById('chat-send').disabled = true;
+
+            chatHistory.push({role: 'user', content: message});
+
+            try {
+                var response = await fetch('/api/chat' + getDbParam(), {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        message: message,
+                        history: chatHistory.slice(0, -1)
+                    })
+                });
+
+                if (!response.ok) {
+                    var errData = await response.json();
+                    throw new Error(errData.message || errData.error || 'Chat request failed');
+                }
+
+                // Remove typing indicator
+                var typing = document.getElementById('chat-typing');
+                if (typing) typing.remove();
+
+                // Create assistant message container
+                var assistantDiv = document.createElement('div');
+                assistantDiv.className = 'chat-msg assistant';
+                var contentDiv = document.createElement('div');
+                contentDiv.className = 'content';
+                assistantDiv.appendChild(contentDiv);
+                msgs.appendChild(assistantDiv);
+
+                // Parse SSE stream from fetch response
+                var reader = response.body.getReader();
+                var decoder = new TextDecoder();
+                var fullText = '';
+                var references = [];
+                var buffer = '';
+                var eventType = '';
+
+                while (true) {
+                    var result = await reader.read();
+                    if (result.done) break;
+
+                    buffer += decoder.decode(result.value, {stream: true});
+                    var lines = buffer.split('\n');
+                    buffer = lines.pop();
+
+                    for (var i = 0; i < lines.length; i++) {
+                        var line = lines[i];
+                        if (line.startsWith('event: ')) {
+                            eventType = line.slice(7).trim();
+                        } else if (line.startsWith('data: ')) {
+                            var data = line.slice(6);
+                            if (eventType === 'references') {
+                                try { references = JSON.parse(data); } catch(e) {}
+                            } else if (eventType === 'token') {
+                                try { fullText += JSON.parse(data); } catch(e) { fullText += data; }
+                                contentDiv.innerHTML = linkifyMemoryRefs(renderMarkdown(fullText));
+                                msgs.scrollTop = msgs.scrollHeight;
+                            } else if (eventType === 'error') {
+                                contentDiv.innerHTML = '<span style="color:#f85149;">Error: ' + escapeHtmlText(data) + '</span>';
+                            } else if (eventType === 'done') {
+                                contentDiv.innerHTML = linkifyMemoryRefs(renderMarkdown(fullText));
+                            }
+                        }
+                    }
+                }
+
+                // Add references
+                if (references.length > 0) {
+                    var refsDiv = document.createElement('div');
+                    refsDiv.className = 'chat-refs';
+                    references.forEach(function(ref) {
+                        var refLink = document.createElement('span');
+                        refLink.className = 'chat-ref';
+                        refLink.textContent = '#' + ref.id;
+                        refLink.title = ref.preview || '';
+                        refLink.onclick = (function(id) {
+                            return function() { showMemoryDetails(id); };
+                        })(ref.id);
+                        refsDiv.appendChild(refLink);
+                    });
+                    assistantDiv.appendChild(refsDiv);
+                }
+
+                chatHistory.push({role: 'assistant', content: fullText});
+                msgs.scrollTop = msgs.scrollHeight;
+
+            } catch (err) {
+                var typing = document.getElementById('chat-typing');
+                if (typing) typing.remove();
+                var errorDiv = document.createElement('div');
+                errorDiv.className = 'chat-msg error';
+                errorDiv.textContent = err.message;
+                msgs.appendChild(errorDiv);
+            } finally {
+                chatStreaming = false;
+                document.getElementById('chat-send').disabled = false;
+                document.getElementById('chat-input').focus();
+            }
+        }
+    </script>
+</body>
+</html>

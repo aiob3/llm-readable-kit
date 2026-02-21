@@ -112,5 +112,29 @@ python3 .agentic/scripts/memora_ops.py correlate \
   --report-path .agentic/memora-human-readable-index.md
 ```
 
+## SSOT Canonical Operations (v1)
+- Hard reset (destrutivo, exige token explicito):
+```bash
+python3 .agentic/scripts/memora_ops.py reset-hard --confirm RESET-YES
+```
+
+- Ingestao canônica idempotente (DSL -> segmentos atomicos):
+```bash
+python3 .agentic/scripts/memora_ops.py canonical-ingest \
+  --dsl .agentic/canonical/bootstrap.dsl \
+  --session-id "<session_id>" \
+  --session-state start
+```
+
+- Recompute de clusters (sessao master):
+```bash
+python3 .agentic/scripts/memora_ops.py recompute-clusters --mode session-master
+```
+
+- Verificacao de integridade (idempotencia, orfaos, politica de duplicates):
+```bash
+python3 .agentic/scripts/memora_ops.py verify-integrity --strict
+```
+
 ## Agent Compliance
 Any agent working in this workspace must treat this protocol as default behavior for all coding-related activities.

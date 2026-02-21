@@ -1,0 +1,103 @@
+[
+  {
+    "name": "actual",
+    "filters": {
+      "logic": "and",
+      "timePreset": "4h",
+      "degreeMin": 0,
+      "showDuplicates": true,
+      "cluster": null,
+      "session": "20260221T040228Z-codex-latest-observability-fix"
+    },
+    "selected": [
+      68,
+      69,
+      70
+    ],
+    "positions": {
+      "67": {
+        "x": -27,
+        "y": 21
+      },
+      "68": {
+        "x": 111,
+        "y": -15
+      },
+      "69": {
+        "x": 231,
+        "y": -100
+      },
+      "70": {
+        "x": 167,
+        "y": -235
+      }
+    },
+    "updated_at": "2026-02-21T05:22:29.070994"
+  },
+  {
+    "name": "tmp-check",
+    "filters": {
+      "logic": "AND"
+    },
+    "selected": [],
+    "omitted": [],
+    "spotlight": {
+      "enabled": false
+    },
+    "positions": {},
+    "filterLogicVersion": "ssot-v1",
+    "updated_at": "2026-02-21T07:51:37.931439"
+  },
+  {
+    "name": "ssot-contract-test",
+    "filters": {
+      "logic": "AND",
+      "timePreset": "4h",
+      "degreeMin": 0,
+      "showDuplicates": true,
+      "showHidden": false,
+      "cluster": null,
+      "session": null,
+      "legendNodeIds": [],
+      "legendFilterKey": null
+    },
+    "selected": [],
+    "omitted": [],
+    "spotlight": {
+      "enabled": false,
+      "hops": 1,
+      "nodeIds": []
+    },
+    "positions": {},
+    "filterLogicVersion": "ssot-v1",
+    "updated_at": "2026-02-21T07:53:51.513033"
+  },
+  {
+    "name": "smoke-v2",
+    "mode": "organogram-flat",
+    "filtersV2": {
+      "sessions": [],
+      "causalNodes": [],
+      "clusters": [],
+      "tags": [],
+      "sections": [],
+      "timePreset": null,
+      "degreeMin": 0,
+      "showDuplicates": true,
+      "showHidden": false
+    },
+    "treeState": {
+      "showCodes": false
+    },
+    "selected": [],
+    "omitted": [],
+    "spotlight": {
+      "enabled": false,
+      "hops": 1,
+      "nodeIds": []
+    },
+    "positions": {},
+    "filterLogicVersion": "ssot-v2",
+    "updated_at": "2026-02-21T09:54:35.375346"
+  }
+]

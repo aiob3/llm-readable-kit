@@ -1,0 +1,21 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e20]:
+    - generic [ref=e21]:
+      - generic [ref=e22]: Timeline
+      - generic [ref=e23]: Drag to filter by time
+      - generic [ref=e24] [cursor=pointer]: Reset
+    - slider [ref=e25] [cursor=pointer]: "100"
+    - generic [ref=e26]:
+      - generic [ref=e27]: Feb 20, 26
+      - generic [ref=e28]: Feb 21, 26
+  - textbox "Search memories..." [ref=e5]
+  - generic [ref=e7]: memora | v0.2.22
+  - generic [ref=e8]: "Use Explorer para filtrar | Click node to view | Scroll to zoom | Type to search (or #id) | Drag timeline"
+  - button "💬" [ref=e9] [cursor=pointer]
+  - generic [ref=e10]:
+    - generic [ref=e11] [cursor=pointer]:
+      - generic [ref=e12]: Chat
+      - button "▼" [ref=e13]
+    - generic [ref=e15]:
+      - textbox "Ask about your memories..." [ref=e16]
+      - button "Send" [ref=e17] [cursor=pointer]
