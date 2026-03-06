@@ -16,3 +16,4 @@ desktop.ini
 .opencode/.env
 .opencode/mcp.json
 .opencode/memory/
+*opencode.json*
